@@ -24,6 +24,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install --no-ins
         python2.7 \
         python3 \
         sox \
+        ffmpeg \
         subversion \
         unzip \
         wget \

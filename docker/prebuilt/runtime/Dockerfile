@@ -39,7 +39,7 @@ RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCT
 RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
 RUN sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list'
 RUN apt-get update
-RUN apt-get install intel-mkl-64bit
+RUN apt-get install intel-mkl-64bit-2019.2-057
 
 # Install Kaldi
 RUN git clone https://github.com/kaldi-asr/kaldi

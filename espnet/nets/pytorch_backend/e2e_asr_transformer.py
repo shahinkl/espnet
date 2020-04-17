@@ -241,7 +241,7 @@ class E2E(ASRInterface, torch.nn.Module):
         """Recognize input speech.
 
         :param ndnarray x: input acoustic feature (B, T, D) or (T, D)
-        :param Namespace recog_args: argment Namespace contraining options
+        :param Namespace recog_args: argument namespace containing options
         :param list char_list: list of characters
         :param torch.nn.Module rnnlm: language model module
         :return: N-best decoding results

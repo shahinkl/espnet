@@ -55,7 +55,7 @@ class ASRInterface:
         """Recognize x for evaluation.
 
         :param ndarray x: input acouctic feature (B, T, D) or (T, D)
-        :param namespace recog_args: argment namespace contraining options
+        :param namespace recog_args: argument namespace containing options
         :param list char_list: list of characters
         :param torch.nn.Module rnnlm: language model module
         :return: N-best decoding results

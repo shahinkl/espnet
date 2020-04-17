@@ -7,7 +7,7 @@ ENV DOCKER_BUILT_VER ${DOCKER_VER}}
 ARG NUM_BUILD_CORES=8
 ENV NUM_BUILD_CORES ${NUM_BUILD_CORES}
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install --no-install-recommends \ 
+RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && apt-get update -y && apt-get -y install --no-install-recommends \
         automake \
         autoconf \
         apt-utils \
@@ -34,11 +34,16 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update && apt-get -y install --no-ins
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+RUN sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list'
+RUN apt-get update
+
 # Install Kaldi
 RUN git clone https://github.com/kaldi-asr/kaldi
 
 RUN cd /kaldi/tools && \
-    ./extras/install_mkl.sh -sp debian intel-mkl-64bit-2019.2-057 && \
+#    ./extras/install_mkl.sh -sp debian intel-mkl-64bit-2019.2-057 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     make all && \

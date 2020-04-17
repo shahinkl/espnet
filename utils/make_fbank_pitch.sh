@@ -1,15 +1,19 @@
 #!/usr/bin/env bash
 
-# Copyright 2012-2016  Karel Vesely
-# Copyright 2012-2016  Johns Hopkins University (Author: Daniel Povey)
+# Copyright 2013  The Shenzhen Key Laboratory of Intelligent Media and Speech,
+#                 PKU-HKUST Shenzhen Hong Kong Institution (Author: Wei Shi)
+#           2016  Johns Hopkins University (Author: Daniel Povey)
 # Apache 2.0
-# To be run from .. (one directory up from here)
-# see ../run.sh for example
+# Combine filterbank and pitch features together
+# Note: This file is based on make_fbank.sh and make_pitch_kaldi.sh
 
 # Begin configuration section.
 nj=4
 cmd=run.pl
 fbank_config=conf/fbank.conf
+pitch_config=conf/pitch.conf
+pitch_postprocess_config=
+paste_length_tolerance=2
 compress=true
 write_utt2num_frames=true  # If true writes utt2num_frames.
 write_utt2dur=true
@@ -27,7 +31,10 @@ Usage: $0 [options] <data-dir> [<log-dir> [<fbank-dir>] ]
 Note: <log-dir> defaults to <data-dir>/log, and
       <fbank-dir> defaults to <data-dir>/data
 Options:
-  --fbank-config <config-file>         # config passed to compute-fbank-feats.
+  --fbank-config <fbank-config-file>   # config passed to compute-fbank-feats.
+  --pitch-config <pitch-config-file>   # config passed to compute-kaldi-pitch-feats.
+  --pitch-postprocess-config <postprocess-config-file> # config passed to process-kaldi-pitch-feats.
+  --paste-length-tolerance <tolerance> # length tolerance passed to paste-feats.
   --nj <nj>                            # number of parallel jobs.
   --cmd <run.pl|queue.pl <queue opts>> # how to run jobs.
   --write-utt2num-frames <true|false>  # If true, write utt2num_frames file.
@@ -43,19 +50,19 @@ else
   logdir=$data/log
 fi
 if [ $# -ge 3 ]; then
-  fbankdir=$3
+  fbank_pitch_dir=$3
 else
-  fbankdir=$data/data
+  fbank_pitch_dir=$data/data
 fi
 
 
-# make $fbankdir an absolute pathname.
-fbankdir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $fbankdir ${PWD}`
+# make $fbank_pitch_dir an absolute pathname.
+fbank_pitch_dir=`perl -e '($dir,$pwd)= @ARGV; if($dir!~m:^/:) { $dir = "$pwd/$dir"; } print $dir; ' $fbank_pitch_dir ${PWD}`
 
 # use "name" as part of name of the archive.
 name=`basename $data`
 
-mkdir -p $fbankdir || exit 1;
+mkdir -p $fbank_pitch_dir || exit 1;
 mkdir -p $logdir || exit 1;
 
 if [ -f $data/feats.scp ]; then
@@ -66,7 +73,7 @@ fi
 
 scp=$data/wav.scp
 
-required="$scp $fbank_config"
+required="$scp $fbank_config $pitch_config"
 
 for f in $required; do
   if [ ! -f $f ]; then
@@ -77,6 +84,12 @@ done
 
 utils/validate_data_dir.sh --no-text --no-feats $data || exit 1;
 
+if [ ! -z "$pitch_postprocess_config" ]; then
+  postprocess_config_opt="--config=$pitch_postprocess_config";
+else
+  postprocess_config_opt=
+fi
+
 if [ -f $data/spk2warp ]; then
   echo "$0 [info]: using VTLN warp factors from $data/spk2warp"
   vtln_opts="--vtln-map=ark:$data/spk2warp --utt2spk=ark:$data/utt2spk"
@@ -86,9 +99,9 @@ elif [ -f $data/utt2warp ]; then
 fi
 
 for n in $(seq $nj); do
-  # the next command does nothing unless $fbankdir/storage/ exists, see
+  # the next command does nothing unless $fbank_pitch_dir/storage/ exists, see
   # utils/create_data_link.pl for more info.
-  utils/create_data_link.pl $fbankdir/raw_fbank_$name.$n.ark
+  utils/create_data_link.pl $fbank_pitch_dir/raw_fbank_pitch_$name.$n.ark
 done
 
 if $write_utt2num_frames; then
@@ -113,40 +126,53 @@ if [ -f $data/segments ]; then
   utils/split_scp.pl $data/segments $split_segments || exit 1;
   rm $logdir/.error 2>/dev/null
 
-  $cmd JOB=1:$nj $logdir/make_fbank_${name}.JOB.log \
-    extract-segments scp,p:$scp $logdir/segments.JOB ark:- \| \
+  fbank_feats="ark:extract-segments scp,p:$scp $logdir/segments.JOB ark:- |\
     compute-fbank-feats $vtln_opts $write_utt2dur_opt --verbose=2 \
-      --config=$fbank_config ark:- ark:- \| \
+      --config=$fbank_config ark:- ark:- |"
+  pitch_feats="ark,s,cs:extract-segments scp,p:$scp $logdir/segments.JOB ark:- | \
+    compute-kaldi-pitch-feats --verbose=2 --config=$pitch_config ark:- ark:- | \
+    process-kaldi-pitch-feats $postprocess_config_opt ark:- ark:- |"
+
+  $cmd JOB=1:$nj $logdir/make_fbank_pitch_${name}.JOB.log \
+    paste-feats --length-tolerance=$paste_length_tolerance \
+      "$fbank_feats" "$pitch_feats" ark:- \| \
     copy-feats --compress=$compress $write_num_frames_opt ark:- \
-     ark,scp:$fbankdir/raw_fbank_$name.JOB.ark,$fbankdir/raw_fbank_$name.JOB.scp \
+      ark,scp:$fbank_pitch_dir/raw_fbank_pitch_$name.JOB.ark,$fbank_pitch_dir/raw_fbank_pitch_$name.JOB.scp \
      || exit 1;
+
 else
   echo "$0: [info]: no segments file exists: assuming wav.scp indexed by utterance."
-  split_scps=""
+  split_scps=
   for n in $(seq $nj); do
-    split_scps="$split_scps $logdir/wav.$n.scp"
+    split_scps="$split_scps $logdir/wav_${name}.$n.scp"
   done
 
   utils/split_scp.pl $scp $split_scps || exit 1;
 
-  $cmd JOB=1:$nj $logdir/make_fbank_${name}.JOB.log \
-    compute-fbank-feats $vtln_opts $write_utt2dur_opt --verbose=2 \
-     --config=$fbank_config scp,p:$logdir/wav.JOB.scp ark:- \| \
+  fbank_feats="ark:compute-fbank-feats $vtln_opts $write_utt2dur_opt \
+   --verbose=2 --config=$fbank_config scp,p:$logdir/wav_${name}.JOB.scp ark:- |"
+  pitch_feats="ark,s,cs:compute-kaldi-pitch-feats --verbose=2 \
+      --config=$pitch_config scp,p:$logdir/wav_${name}.JOB.scp ark:- | \
+    process-kaldi-pitch-feats $postprocess_config_opt ark:- ark:- |"
+
+  $cmd JOB=1:$nj $logdir/make_fbank_pitch_${name}.JOB.log \
+    paste-feats --length-tolerance=$paste_length_tolerance \
+      "$fbank_feats" "$pitch_feats" ark:- \| \
     copy-feats --compress=$compress $write_num_frames_opt ark:- \
-     ark,scp:$fbankdir/raw_fbank_$name.JOB.ark,$fbankdir/raw_fbank_$name.JOB.scp \
-     || exit 1;
+      ark,scp:$fbank_pitch_dir/raw_fbank_pitch_$name.JOB.ark,$fbank_pitch_dir/raw_fbank_pitch_$name.JOB.scp \
+      || exit 1;
 fi
 
 
 if [ -f $logdir/.error.$name ]; then
-  echo "$0: Error producing filterbank features for $name:"
-  tail $logdir/make_fbank_${name}.1.log
+  echo "$0: Error producing filterbank and pitch features for $name:"
+  tail $logdir/make_fbank_pitch_${name}.1.log
   exit 1;
 fi
 
-# concatenate the .scp files together.
+# Concatenate the .scp files together.
 for n in $(seq $nj); do
-  cat $fbankdir/raw_fbank_$name.$n.scp || exit 1
+  cat $fbank_pitch_dir/raw_fbank_pitch_$name.$n.scp || exit 1
 done > $data/feats.scp || exit 1
 
 if $write_utt2num_frames; then
@@ -161,11 +187,13 @@ if $write_utt2dur; then
   done > $data/utt2dur || exit 1
 fi
 
-# Store frame_shift and fbank_config along with features.
+# Store frame_shift, fbank_config and pitch_config along with features.
 frame_shift=$(perl -ne 'if (/^--frame-shift=(\d+)/) {
                           printf "%.3f", 0.001 * $1; exit; }' $fbank_config)
 echo ${frame_shift:-'0.01'} > $data/frame_shift
-mkdir -p $data/conf && cp $fbank_config $data/conf/fbank.conf || exit 1
+mkdir -p $data/conf &&
+  cp $fbank_config $data/conf/fbank.conf &&
+  cp $pitch_config $data/conf/pitch.conf || exit 1
 
 rm $logdir/wav_${name}.*.scp  $logdir/segments.* \
    $logdir/utt2num_frames.* $logdir/utt2dur.* 2>/dev/null
@@ -183,4 +211,4 @@ if (( nf < nu - nu/20 )); then
   exit 1
 fi
 
-echo "$0: Succeeded creating filterbank features for $name"
+echo "$0: Succeeded creating filterbank and pitch features for $name"

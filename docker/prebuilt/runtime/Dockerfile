@@ -19,6 +19,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && apt-get update -y && ap
         flac \
         gawk \
         gfortran \
+        gnupg2 \
         git \
         libtool \
         python2.7 \

@@ -35,17 +35,17 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && apt-get update -y && ap
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
-RUN sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list'
-RUN apt-get update
-RUN apt-get install -y intel-mkl-64bit-2019.2-057
+#RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+#RUN apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2019.PUB
+#RUN sh -c 'echo deb https://apt.repos.intel.com/mkl all main > /etc/apt/sources.list.d/intel-mkl.list'
+#RUN apt-get update
+#RUN apt-get install -y intel-mkl-64bit-2019.2-057
 
 # Install Kaldi
 RUN git clone https://github.com/kaldi-asr/kaldi
 
 RUN cd /kaldi/tools && \
-#    ./extras/install_mkl.sh -sp debian intel-mkl-64bit-2019.2-057 && \
+    ./extras/install_mkl.sh -sp debian intel-mkl-64bit-2019.2-057 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     make all && \

@@ -22,7 +22,7 @@ transformer-attn-dropout-rate-encoder: 0.4
 ## encoder related
 etype: transformer
 transformer-input-layer: conv2d
-elayers: 6
+elayers: 8
 eunits: 1024
 dropout-rate: 0.4
 ## decoder related

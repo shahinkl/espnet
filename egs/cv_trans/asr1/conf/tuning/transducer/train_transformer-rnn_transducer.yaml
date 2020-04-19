@@ -23,17 +23,17 @@ transformer-attn-dropout-rate-encoder: 0.4
 etype: transformer
 transformer-input-layer: vgg2l
 elayers: 6
-eunits: 320
+eunits: 512
 dropout-rate: 0.4
 ## decoder related
 dtype: lstm
 dlayers: 1
-dec-embed-dim: 300
-dunits: 300
+dec-embed-dim: 512
+dunits: 512
 dropout-rate-decoder: 0.2
 dropout-rate-embed-decoder: 0.1
 ## attention related
-adim: 320
+adim: 512
 aheads: 4
 ## joint network related
 joint-dim: 300

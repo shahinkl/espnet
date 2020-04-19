@@ -13,8 +13,8 @@ patience: 3
 
 # network architecture
 ## encoder related
-etype: vggblstm
-elayers: 4
+etype: lstm
+elayers: 8
 eunits: 512
 eprojs: 512
 subsample: "1_2_2_1_1"
@@ -28,7 +28,7 @@ dropout-rate-decoder: 0.1
 dropout-rate-embed-decoder: 0.1
 ## attention related
 atype: location
-adim: 320
+adim: 512
 aheads: 1
 awin: 5
 aconv-chans: 10

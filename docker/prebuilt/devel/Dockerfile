@@ -30,7 +30,7 @@ RUN if [ -z "$( nvcc -V )" ]; then \
     fi; \ 
     if [ "${CUDA_VER}" = "10.1" ]; then \
         # Pytorch 1.3.1 is not supported by warpctc 
-        MY_OPTS="${MY_OPTS} TH_VERSION=1.3.1";  \
+        MY_OPTS="${MY_OPTS} TH_VERSION=1.4.0";  \
     fi; \
     echo "Make with options ${MY_OPTS}"; \
     make KALDI=/kaldi ${MY_OPTS}

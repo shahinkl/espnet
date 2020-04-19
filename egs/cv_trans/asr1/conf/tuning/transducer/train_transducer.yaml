@@ -15,26 +15,26 @@ patience: 3
 ## encoder related
 etype: lstm
 elayers: 8
-eunits: 512
-eprojs: 512
-subsample: "1_2_2_1_1"
+eunits: 1024
+eprojs: 1024
+subsample: "1_1_1_1_1"
 dropout-rate: 0.0
 ## decoder related
 dtype: lstm
 dlayers: 1
-dec-embed-dim: 512
-dunits: 512
+dec-embed-dim: 1024
+dunits: 1024
 dropout-rate-decoder: 0.1
 dropout-rate-embed-decoder: 0.1
 ## attention related
 atype: location
-adim: 512
+adim: 1024
 aheads: 1
 awin: 5
 aconv-chans: 10
 aconv-filts: 100
 ## joint network related
-joint-dim: 512
+joint-dim: 1024
 
 # transducer related
 mtlalpha: 1.0 # mtlalpha should be set to 1.0 (CTC) to use transducer

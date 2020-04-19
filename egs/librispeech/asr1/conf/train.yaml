@@ -1,1 +1,1 @@
-tuning/train_pytorch_transformer_large_ngpu4.yaml
+tuning/transducer/train_transformer-rnn_transducer.yaml

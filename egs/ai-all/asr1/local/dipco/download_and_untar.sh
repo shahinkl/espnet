@@ -14,7 +14,7 @@ if [ "$1" == --remove-archive ]; then
   shift
 fi
 
-if [ $# -ne 2 ]; then
+if [ $# -ne 3 ]; then
   echo "Usage: $0 [--remove-archive] <data-base> <url> <filename>"
   echo "e.g.: $0 /export/data/ https://s3.amazonaws.com/dipco/DiPCo.tgz"
   echo "With --remove-archive it will remove the archive after successfully un-tarring it."

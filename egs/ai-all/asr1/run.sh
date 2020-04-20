@@ -103,24 +103,29 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     local/ami/ami_download.sh ${mic} "${dwl_dir}/ami" &
     sleep 15
     # 2. COMMON VOICE
-    echo "local/commonvoice/download_and_untar.sh ${dwl_dir}/commonvoice ${data_url_cv} ${lang}.tar.gz"
+    printf "\n\n Starting to download common-voice dataset ..."
     local/commonvoice/download_and_untar.sh "${dwl_dir}/commonvoice" ${data_url_cv} ${lang}.tar.gz &
     sleep 15
     # 3. DIPCO
+    printf "\n\n Starting to download dipco dataset ..."
     local/dipco/download_and_untar.sh "${dwl_dir}/dipco" ${data_url_dc} DiPCo.tgz &
     sleep 15
     # 4. LIBRISPEECH
+    printf "\n\n Starting to download librispeech dataset ..."
     for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
         local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
         sleep 20
     done
     # 5. TEDLIUM 2
+    printf "\n\n Starting to download tedlium-2 dataset ..."
     local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
     sleep 15
     # 6. TEDLIUM 3
+    printf "\n\n Starting to download tedlium-3 dataset ..."
     local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} TEDLIUM_release-3.tgz &
     sleep 15
     # 7. VOXFORGE
+    printf "\n\n Starting to download voxforge dataset ..."
     local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
     wait # Wait for all process to complete
 fi

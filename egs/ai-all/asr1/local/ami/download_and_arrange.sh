@@ -9,5 +9,5 @@ if [ -d "${dwl_dir}" ] && ! touch "${dwl_dir}/.foo" 2>/dev/null; then
 elif [ -e "${data_dir}/local/downloads/wget_${mic}.sh" ]; then
   echo "${data_dir}/local/downloads/wget_$mic.sh already exists, better skip than re-download."
 else
-  local/ami/download.sh "${mic}" "${dwl_dir}/ami"
+  local/ami/ami_download.sh "${mic}" "${dwl_dir}/ami"
 fi

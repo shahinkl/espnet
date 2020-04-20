@@ -104,6 +104,7 @@ data_url_ls=www.openslr.org/resources/12
 data_url_td2=http://www.openslr.org/resources/19/TEDLIUM_release2.tar.gz
 # TEDLIUM 3
 data_url_td3=http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz
+data_type=legacy
 # VOXFORGE
 
 # bpemode (unigram or bpe)
@@ -182,6 +183,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   sleep 5
 
   # 4. LIBRISPEECH
+  printf "\n\n Starting to prepare librispeech data ...\n"
   for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
     # use underscore-separated names in data directories.
     local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}" &
@@ -189,9 +191,15 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   done
 
   # 5. TEDLIUM-2
+  printf "\n\n Starting to prepare tedlium2 data ...\n"
+  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2" &
 
   # 6. TEDLIUM-3
+  printf "\n\n Starting to prepare tedlium3 data ...\n"
+  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}" &
+
   # 7. VOXFORGE
+  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
   wait # Wait for all process to complete
   printf "\n\n Completed stage 0: Data preparation\n"

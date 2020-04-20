@@ -169,39 +169,34 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   echo "Starting stage 0: Data preparation"
   # 1. AMI
   printf "\n\n Starting to prepare ami data ...\n"
-  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami" &
-  sleep 5
+  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
 
   # 2. COMMON VOICE
   printf "\n\n Starting to prepare common-voice data ...\n"
-  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}" &
-  sleep 5
+  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
 
   # 3. DIPCO
   printf "\n\n Starting to prepare dipco data ...\n"
-  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement" &
-  sleep 5
+  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
 
   # 4. LIBRISPEECH
   printf "\n\n Starting to prepare librispeech data ...\n"
   for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
     # use underscore-separated names in data directories.
-    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}" &
-    sleep 5
+    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
   done
 
   # 5. TEDLIUM-2
   printf "\n\n Starting to prepare tedlium2 data ...\n"
-  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2" &
+  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
 
   # 6. TEDLIUM-3
   printf "\n\n Starting to prepare tedlium3 data ...\n"
-  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}" &
+  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
 
   # 7. VOXFORGE
-  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}" &
+  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
-  wait # Wait for all process to complete
   printf "\n\n Completed stage 0: Data preparation\n"
 fi
 

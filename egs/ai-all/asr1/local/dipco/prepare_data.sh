@@ -8,11 +8,11 @@ data_dir=$2
 enhancement=$3
 mictype=worn
 
-mkdir -p "${dwl_dir}/enhancement"
+mkdir -p "${dwl_dir}/DiPCo/enhancement"
 
-json_dir=${dwl_dir}/transcriptions
-audio_dir=${dwl_dir}/audio
-enhandir="${dwl_dir}/enhancement"
+json_dir="${dwl_dir}/DiPCo/transcriptions"
+audio_dir="${dwl_dir}/DiPCo/audio"
+enhandir="${dwl_dir}/DiPCo/enhancement"
 
 for dset in dev eval; do
   local/dipco/prepare_dipco_data.sh --mictype ${mictype} "${audio_dir}/${dset}" "${json_dir}/${dset}" "${data_dir}/${dset}_${mictype}"

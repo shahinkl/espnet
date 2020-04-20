@@ -112,7 +112,7 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     # 4. LIBRISPEECH
     for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
         local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
-        sleep 15
+        sleep 20
     done
     # 5. TEDLIUM 2
     local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &

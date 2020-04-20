@@ -114,10 +114,10 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
         sleep 5
     done
     # 5. TEDLIUM 2
-    local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} ${lang}.tar.gz &
+    local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
     sleep 5
     # 6. TEDLIUM 3
-    local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} ${lang}.tar.gz &
+    local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} TEDLIUM_release-3.tgz &
     sleep 5
     # 7. VOXFORGE
     local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &

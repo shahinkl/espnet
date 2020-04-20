@@ -51,7 +51,7 @@ mkdir -p $wdir/log
 
 #download waves
 
-cat local/split_train.orig local/split_eval.orig local/split_dev.orig > $wdir/ami_meet_ids.flist
+cat local/ami/split_train.orig local/ami/split_eval.orig local/ami/split_dev.orig > $wdir/ami_meet_ids.flist
 
 wgetfile=$wdir/wget_$mic.sh
 

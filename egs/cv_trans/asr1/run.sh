@@ -16,6 +16,7 @@ dumpdir=dump   # directory to dump full features
 N=0            # number of minibatches to be used (mainly for debugging). "0" uses all minibatches.
 verbose=0      # verbose option
 resume="snapshot.ep.15"        # Resume the training from snapshot
+nj=72
 
 # feature configuration
 do_delta=false
@@ -29,7 +30,7 @@ lm_resume=        # specify a snapshot file to resume LM training
 lmtag=            # tag for managing LMs
 
 # decoding parameter
-recog_model=model.acc.best # set a model to be used for decoding: 'model.acc.best' or 'model.loss.best'
+recog_model=model.loss.best # set a model to be used for decoding: 'model.acc.best' or 'model.loss.best'
 n_average=10
 
 datadir=downloads # original data directory to be stored
@@ -92,7 +93,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     fbankdir=fbank
     # Generate the fbank features; by default 80-dimensional fbanks with pitch on each frame
     for x in ${train_set} ${train_dev} ${recog_set}; do
-        steps/make_fbank.sh --cmd "$train_cmd" --nj 4 --write_utt2num_frames true \
+        steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true \
                                   data/${x} exp/make_fbank/${x} ${fbankdir}
         utils/fix_data_dir.sh data/${x}
     done
@@ -107,13 +108,13 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     # compute global CMVN
     compute-cmvn-stats scp:data/${train_set}/feats.scp data/${train_set}/cmvn.ark
 
-    dump.sh --cmd "$train_cmd" --nj 4 --do_delta ${do_delta} \
+    dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
             data/${train_set}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/train ${feat_tr_dir}
-    dump.sh --cmd "$train_cmd" --nj 4 --do_delta ${do_delta} \
+    dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
             data/${train_dev}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/dev ${feat_dt_dir} 
     for rtask in ${recog_set}; do
         feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}; mkdir -p ${feat_recog_dir}
-        dump.sh --cmd "$train_cmd" --nj 4 --do_delta ${do_delta} \
+        dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
                 data/${rtask}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/recog/${rtask} \
                 ${feat_recog_dir}
     done
@@ -206,7 +207,6 @@ fi
 
 if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
     echo "stage 5: Decoding"
-    nj=4
     if [[ $(get_yaml.py ${train_config} model-module) = *transformer* ]]; then
 	recog_model=model.last${n_average}.avg.best
 	average_checkpoints.py --backend ${backend} \

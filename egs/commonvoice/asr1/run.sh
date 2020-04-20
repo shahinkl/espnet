@@ -36,7 +36,8 @@ datadir=downloads # original data directory to be stored
 lang=en # en de fr cy tt kab ca zh-TW it fa eu es ru
 
 # base url for downloads.
-data_url=https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/$lang.tar.gz
+#data_url=https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-3/$lang.tar.gz
+data_url=https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/$lang.tar.gz
 
 # bpemode (unigram or bpe)
 nbpe=150 # 2020 for zh-TW

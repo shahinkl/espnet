@@ -48,52 +48,35 @@ dwl_dir=downloads
 data_dir=data
 lang=en
 
-mkdir -p ${dwl_dir}
-mkdir -p ${data_dir}
+# MAKE DIRECTORIES
+mkdir -p "${dwl_dir}/ami"
+mkdir -p "${dwl_dir}/commonvoice"
+mkdir -p "${dwl_dir}/dipco"
+mkdir -p "${dwl_dir}/librispeech"
+mkdir -p "${dwl_dir}/tedlium2"
+mkdir -p "${dwl_dir}/tedlium3"
+mkdir -p "${dwl_dir}/voxforge"
+mkdir -p "${data_dir}/ami"
+mkdir -p "${data_dir}/commonvoice"
+mkdir -p "${data_dir}/dipco"
+mkdir -p "${data_dir}/librispeech"
+mkdir -p "${data_dir}/tedlium2"
+mkdir -p "${data_dir}/tedlium3"
+mkdir -p "${data_dir}/voxforge"
+
 # AMI
-dwl_dir-ami=${dwl_dir}/ami
-data_dir-ami=${data_dir}/ami
 mic=ihm
 # COMMONVOICE
-dwl_dir-commonvoice=${dwl_dir}/commonvoice
 data_url_cv=https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/$lang.tar.gz
-data_dir-commonvoice=${data_dir}/commonvoice
 # DIPCO
-dwl_dir-dipco=${dwl_dir}/dipco
 data_url_dc=https://s3.amazonaws.com/dipco/DiPCo.tgz
-data_dir-dipco=${data_dir}/dipco
 # LIBRISPEECH
-dwl_dir-librispeech=${dwl_dir}/librispeech
 data_url_ls=www.openslr.org/resources/12
-data_dir-librispeech=${data_dir}/librispeech
 # TEDLIUM 2
-dwl_dir-tedlium2=${dwl_dir}/tedlium2
 data_url_td2=http://www.openslr.org/resources/19/TEDLIUM_release2.tar.gz
-data_dir-tedlium2=${data_dir}/tedlium2
 # TEDLIUM 3
-dwl_dir-tedlium3=${dwl_dir}/tedlium3
 data_url_td3=http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz
-data_dir-tedlium3=${data_dir}/tedlium3
 # VOXFORGE
-dwl_dir-voxforge=${dwl_dir}/voxforge
-data_dir-voxforge=${data_dir}/voxforge
-
-# MAKE DIRECTORIES
-mkdir -p ${dwl_dir-ami}
-mkdir -p ${dwl_dir-commonvoice}
-mkdir -p ${dwl_dir-dipco}
-mkdir -p ${dwl_dir-librispeech}
-mkdir -p ${dwl_dir-tedlium2}
-mkdir -p ${dwl_dir-tedlium3}
-mkdir -p ${dwl_dir-voxforge}
-mkdir -p ${data_dir-ami}
-mkdir -p ${data_dir-commonvoice}
-mkdir -p ${data_dir-dipco}
-mkdir -p ${data_dir-librispeech}
-mkdir -p ${data_dir-tedlium2}
-mkdir -p ${data_dir-tedlium3}
-mkdir -p ${data_dir-voxforge}
-
 
 # bpemode (unigram or bpe)
 nbpe=5000
@@ -117,21 +100,21 @@ recog_set="test_clean test_other dev_clean dev_other"
 if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     echo "stage -1: Data Download"
     # 1. AMI
-    local/ami/ami_download.sh ${mic} ${dwl_dir-ami} &
+    local/ami/ami_download.sh ${mic} "${dwl_dir}/ami" &
     # 2. COMMON VOICE
-    local/commonvoice/download_and_untar.sh ${dwl_dir-commonvoice} ${data_url_cv} ${lang}.tar.gz &
+    local/commonvoice/download_and_untar.sh "${dwl_dir}/commonvoice" ${data_url_cv} ${lang}.tar.gz &
     # 3. DIPCO
-    local/dipco/download_and_untar.sh ${dwl_dir-dipco} ${data_url_dc} DiPCo.tgz &
+    local/dipco/download_and_untar.sh "${dwl_dir}/dipco" ${data_url_dc} DiPCo.tgz &
     # 4. LIBRISPEECH
     for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
-        local/librispeech/download_and_untar.sh ${dwl_dir-librispeech} ${data_url_ls} ${part} &
+        local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
     done
     # 5. TEDLIUM 2
-    local/tedlium2/download_and_untar.sh ${dwl_dir-tedlium2} ${data_url_td2} ${lang}.tar.gz &
+    local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} ${lang}.tar.gz &
     # 6. TEDLIUM 3
-    local/tedlium3/download_and_untar.sh ${dwl_dir-tedlium3} ${data_url_td3} ${lang}.tar.gz &
+    local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} ${lang}.tar.gz &
     # 7. VOXFORGE
-    local/voxforge/getdata.sh ${lang} ${dwl_dir-voxforge} &
+    local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
     wait # Wait for all process to complete
 fi
 

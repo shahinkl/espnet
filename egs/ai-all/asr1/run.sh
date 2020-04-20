@@ -100,32 +100,33 @@ recog_set="test_clean test_other dev_clean dev_other"
 if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     echo "stage -1: Data Download"
     # 1. AMI
+    printf "\n\n Starting to download ami dataset ...\n"
     local/ami/ami_download.sh ${mic} "${dwl_dir}/ami" &
     sleep 15
     # 2. COMMON VOICE
-    printf "\n\n Starting to download common-voice dataset ..."
+    printf "\n\n Starting to download common-voice dataset ...\n"
     local/commonvoice/download_and_untar.sh "${dwl_dir}/commonvoice" ${data_url_cv} ${lang}.tar.gz &
     sleep 15
     # 3. DIPCO
-    printf "\n\n Starting to download dipco dataset ..."
+    printf "\n\n Starting to download dipco dataset ...\n"
     local/dipco/download_and_untar.sh "${dwl_dir}/dipco" ${data_url_dc} DiPCo.tgz &
     sleep 15
     # 4. LIBRISPEECH
-    printf "\n\n Starting to download librispeech dataset ..."
+    printf "\n\n Starting to download librispeech dataset ...\n"
     for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
         local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
-        sleep 20
+        sleep 17
     done
     # 5. TEDLIUM 2
-    printf "\n\n Starting to download tedlium-2 dataset ..."
+    printf "\n\n Starting to download tedlium-2 dataset ...\n"
     local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
     sleep 15
     # 6. TEDLIUM 3
-    printf "\n\n Starting to download tedlium-3 dataset ..."
+    printf "\n\n Starting to download tedlium-3 dataset ...\n"
     local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} TEDLIUM_release-3.tgz &
     sleep 15
     # 7. VOXFORGE
-    printf "\n\n Starting to download voxforge dataset ..."
+    printf "\n\n Starting to download voxforge dataset ...\n"
     local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
     wait # Wait for all process to complete
 fi

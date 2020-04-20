@@ -101,18 +101,24 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     echo "stage -1: Data Download"
     # 1. AMI
     local/ami/ami_download.sh ${mic} "${dwl_dir}/ami" &
+    sleep 5
     # 2. COMMON VOICE
     local/commonvoice/download_and_untar.sh "${dwl_dir}/commonvoice" ${data_url_cv} ${lang}.tar.gz &
+    sleep 5
     # 3. DIPCO
     local/dipco/download_and_untar.sh "${dwl_dir}/dipco" ${data_url_dc} DiPCo.tgz &
+    sleep 5
     # 4. LIBRISPEECH
     for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
         local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
+        sleep 5
     done
     # 5. TEDLIUM 2
     local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} ${lang}.tar.gz &
+    sleep 5
     # 6. TEDLIUM 3
     local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} ${lang}.tar.gz &
+    sleep 5
     # 7. VOXFORGE
     local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
     wait # Wait for all process to complete

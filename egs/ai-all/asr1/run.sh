@@ -93,13 +93,11 @@ mkdir -p "${data_dir}/voxforge"
 
 # AMI
 mic=ihm
-base_mic=${mic//[0-9]/} # sdm, ihm or mdm
-nmics=${mic//[a-z]/}    # e.g. 8 for mdm8
-
 # COMMONVOICE
 data_url_cv=https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/$lang.tar.gz
 # DIPCO
 data_url_dc=https://s3.amazonaws.com/dipco/DiPCo.tgz
+enhancement=beamformit
 # LIBRISPEECH
 data_url_ls=www.openslr.org/resources/12
 # TEDLIUM 2
@@ -123,23 +121,18 @@ set -e
 set -u
 set -o pipefail
 
-train_set=train_ai_all
-train_dev=dev
+train_set=train_data
+train_dev=dev_data
+test_set=test_data
+
 recog_set="test_clean test_other dev_clean dev_other"
 
 if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
-  echo "stage -1: Data Download"
+  echo "Starting stage -1: Data Download"
   # 1. AMI
   printf "\n\n Starting to download ami dataset ...\n"
-  if [ -d "${dwl_dir}/ami" ] && ! touch "${dwl_dir}/ami/.foo" 2>/dev/null; then
-    echo "$0: directory ${dwl_dir}/ami seems to exist and not be owned by you."
-    echo "Assuming the data does not need to be downloaded.  Please use --stage 0 or more."
-  elif [ -e "${data_dir}/ami/local/downloads/wget_${mic}.sh" ]; then
-    echo "${data_dir}/ami/local/downloads/wget_$mic.sh already exists, better skip than re-download."
-  else
-    local/ami/ami_download.sh ${mic} "${dwl_dir}/ami" "${data_dir}/ami" &
-    sleep 15
-  fi
+  local/ami/download_and_arrange.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami" &
+  sleep 15
   # 2. COMMON VOICE
   printf "\n\n Starting to download common-voice dataset ...\n"
   local/commonvoice/download_and_untar.sh "${dwl_dir}/commonvoice" ${data_url_cv} ${lang}.tar.gz &
@@ -166,29 +159,27 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
   printf "\n\n Starting to download voxforge dataset ...\n"
   local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
   wait # Wait for all process to complete
+  printf "\n\n Completed stage -1: Data Download\n"
 fi
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   ### Task dependent. You have to make data the following preparation part by yourself.
   ### But you can utilize Kaldi recipes in most cases
-  echo "stage 0: Data preparation"
+  echo "Starting stage 0: Data preparation"
   # 1. AMI
   printf "\n\n Starting to prepare ami data ...\n"
-  # common data prep
-  if [ ! -d "${data_dir}/ami/local/downloads/annotations" ]; then
-    local/ami/ami_text_prep.sh "${data_dir}/ami/local/downloads/annotations"
-  fi
-  local/ami/ami_${base_mic}_data_prep.sh "${data_dir}/ami" ${mic} &
+  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami" &
   sleep 5
 
   # 2. COMMON VOICE
   printf "\n\n Starting to prepare common-voice data ...\n"
-  for part in "validated"; do
-    # use underscore-separated names in data directories.
-    local/commonvoice/data_prep.pl "${dwl_dir}/commonvoice" ${part} "${data_dir}/commonvoice"/"$(echo "${part}_${lang}" | tr - _)"
-  done
+  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}" &
+  sleep 5
 
-
+  # 3. DIPCO
+  printf "\n\n Starting to prepare dipco data ...\n"
+  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement" &
+  sleep 5
 
   # 4. LIBRISPEECH
   for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
@@ -196,7 +187,13 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}" &
     sleep 5
   done
+
+  # 5. TEDLIUM-2
+  # 6. TEDLIUM-3
+  # 7. VOXFORGE
+
   wait # Wait for all process to complete
+  printf "\n\n Completed stage 0: Data preparation\n"
 fi
 
 feat_tr_dir=${dumpdir}/${train_set}/delta${do_delta}

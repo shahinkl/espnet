@@ -145,7 +145,7 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
   printf "\n\n Starting to download librispeech dataset ...\n"
   for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
     local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
-    sleep 17
+    sleep 90
   done
   # 5. TEDLIUM 2
   printf "\n\n Starting to download tedlium-2 dataset ...\n"
@@ -189,6 +189,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   done
 
   # 5. TEDLIUM-2
+
   # 6. TEDLIUM-3
   # 7. VOXFORGE
 

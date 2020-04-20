@@ -70,12 +70,12 @@ while read line; do
      done
      for m in 0 1 2 3 $extra_headset; do
        # Hint: avoiding re-download by '--continue',
-       echo "wget -nv --continue -P $adir/$line/audio $amiurl/AMICorpusMirror/amicorpus/$line/audio/$line.Headset-$m.wav" >> $wgetfile
+       echo "wget -nv --continue --quiet --show-progress -P $adir/$line/audio $amiurl/AMICorpusMirror/amicorpus/$line/audio/$line.Headset-$m.wav" >> $wgetfile
      done
    else
      for m in $mics; do
        # Hint: avoiding re-download by '--continue',
-       echo "wget -nv --continue -P $adir/$line/audio $amiurl/AMICorpusMirror/amicorpus/$line/audio/$line.Array1-0$m.wav" >> $wgetfile
+       echo "wget -nv --continue --quiet --show-progress -P $adir/$line/audio $amiurl/AMICorpusMirror/amicorpus/$line/audio/$line.Array1-0$m.wav" >> $wgetfile
      done
    fi
 done < $wdir/ami_meet_ids.flist

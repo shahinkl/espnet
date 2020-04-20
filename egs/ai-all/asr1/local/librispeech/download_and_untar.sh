@@ -76,7 +76,7 @@ if [ ! -f $data/$part.tar.gz ]; then
   full_url=$url/$part.tar.gz
   echo "$0: downloading data from $full_url.  This may take some time, please be patient."
 
-  if ! wget -P $data --no-check-certificate $full_url; then
+  if ! wget -P $data --no-check-certificate --quiet --show-progress $full_url; then
     echo "$0: error executing wget $full_url"
     exit 1
   fi

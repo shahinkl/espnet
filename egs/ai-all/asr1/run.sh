@@ -47,6 +47,9 @@ use_lm_valbest_average=false # if true, the validation `lm_n_average`-best langu
 dwl_dir=downloads
 data_dir=data
 lang=en
+
+mkdir -p ${dwl_dir}
+mkdir -p ${data_dir}
 # AMI
 dwl_dir-ami=${dwl_dir}/ami
 data_dir-ami=${data_dir}/ami

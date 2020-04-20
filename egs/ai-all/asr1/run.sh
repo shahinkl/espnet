@@ -199,7 +199,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}" &
 
   # 7. VOXFORGE
-  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
+  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}" &
 
   wait # Wait for all process to complete
   printf "\n\n Completed stage 0: Data preparation\n"

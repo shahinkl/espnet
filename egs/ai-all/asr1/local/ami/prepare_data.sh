@@ -7,8 +7,8 @@ data_dir=$3
 base_mic=${mic//[0-9]/} # sdm, ihm or mdm
 
 # common data prep
-if [ ! -d "${data_dir}/local/downloads/annotations" ]; then
-  local/ami/ami_text_prep.sh "${data_dir}/local/downloads/annotations"
+if [ ! -d "${data_dir}/annotations" ]; then
+  local/ami/ami_text_prep.sh "${data_dir}"
 fi
 local/ami/"ami_${base_mic}_data_prep.sh" "${dwl_dir}" "${mic}"
 

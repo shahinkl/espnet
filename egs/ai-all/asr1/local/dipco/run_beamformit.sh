@@ -73,7 +73,7 @@ for n in `seq $nj`; do
 cat << EOF > $expdir/log/beamform.$n.sh
 while read line; do
   $BEAMFORMIT/BeamformIt -s \$line -c $input_arrays \
-    --config_file `pwd`/conf/beamformit.cfg \
+    --config_file `pwd`/local/dipco/beamformit.cfg \
     --source_dir $sdir \
     --result_dir $odir
 done < $output_wavfiles.$n

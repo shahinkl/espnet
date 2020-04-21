@@ -31,9 +31,9 @@ for dset in dev eval; do
     local/dipco/prepare_dipco_data.sh --mictype ${mictype} "${enhandir}/${dset}_${enhancement}_${mictype}" "${json_dir}/${dset}" "${data_dir}/${dset}_${enhancement}_ref_${mictype}"
   done
 
-  ddirs=$(ls -d "${data_dir}/${dset}_${enhancement}_ref_u0*")
-  utils/combine_data.sh "${data_dir}/${dset}_${enhancement}_ref ${ddirs}"
-  rm -rf "${data_dir}/${dset}_${enhancement}_ref_u0*"
+  ddirs=$(ls -d "${data_dir}/${dset}_${enhancement}"_ref_u0*)
+  utils/combine_data.sh "${data_dir}/${dset}_${enhancement}_ref" "${ddirs}"
+  rm -rf "${data_dir}/${dset}_${enhancement}"_ref_u0*
 done
 # only use left channel for worn mic recognition
 # you can use both left and right channels for training

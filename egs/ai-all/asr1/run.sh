@@ -175,16 +175,16 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
 #  printf "\n\n Starting to prepare common-voice data ...\n"
 #  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
 
-  # 3. DIPCO
-  printf "\n\n Starting to prepare dipco data ...\n"
-  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
-
-  # 4. LIBRISPEECH
-  printf "\n\n Starting to prepare librispeech data ...\n"
-  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
-    # use underscore-separated names in data directories.
-    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
-  done
+#  # 3. DIPCO
+#  printf "\n\n Starting to prepare dipco data ...\n"
+#  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
+#
+#  # 4. LIBRISPEECH
+#  printf "\n\n Starting to prepare librispeech data ...\n"
+#  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
+#    # use underscore-separated names in data directories.
+#    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
+#  done
 
   # 5. TEDLIUM-2
   printf "\n\n Starting to prepare tedlium2 data ...\n"

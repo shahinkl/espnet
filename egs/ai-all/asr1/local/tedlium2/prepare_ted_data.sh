@@ -37,7 +37,7 @@ for set in dev test train; do
 ;; LABEL "female" "Female" "Female Talkers"
 ;;'
     # Process the STMs
-    cat "${dwl_dir}/TEDLIUM_release2/$set/stm/*.stm" | sort -k1,1 -k2,2 -k4,4n | \
+    cat "${dwl_dir}"/TEDLIUM_release2/$set/stm/*.stm | sort -k1,1 -k2,2 -k4,4n | \
       sed -e 's:<F0_M>:<o,f0,male>:' \
           -e 's:<F0_F>:<o,f0,female>:' \
           -e 's:([0-9])::g' \

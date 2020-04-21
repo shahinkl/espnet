@@ -47,9 +47,9 @@ utils/shuffle_list.pl $tmpdata/prompts | \
 echo "number of train set prompts: `wc -l $tmpdata/tr_prompts | awk '{print $1}'`"
 
 # it takes very long time when # prompts is large
-cat $sdata/text | local/filter_text.py -f $tmpdata/dt_prompts | awk '{print $1}' | sort > $tmpdata/dt.ids
+cat $sdata/text | local/commonvoice/filter_text.py -f $tmpdata/dt_prompts | awk '{print $1}' | sort > $tmpdata/dt.ids
 echo "finished text extraction for dev set #utt = `wc -l $tmpdata/dt.ids | awk '{print $1}'`"
-cat $sdata/text | local/filter_text.py -f $tmpdata/et_prompts | awk '{print $1}' | sort > $tmpdata/et.ids
+cat $sdata/text | local/commonvoice/filter_text.py -f $tmpdata/et_prompts | awk '{print $1}' | sort > $tmpdata/et.ids
 echo "finished text extraction for dev set #utt = `wc -l $tmpdata/et.ids | awk '{print $1}'`"
 cat $tmpdata/dt.ids $tmpdata/et.ids | sort > $tmpdata/dtet.ids
 cat $sdata/text | awk '{print $1}' | sort > $tmpdata/all.ids

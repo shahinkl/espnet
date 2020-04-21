@@ -44,7 +44,7 @@ echo "$0: Converting transcription to text"
 
 mkdir -p $dir
 for file in $jdir/*json; do
-  ./local/json2text.py --mictype $mictype $file
+  ./local/dipco/json2text.py --mictype $mictype $file
 done | \
   sed -e "s/\[inaudible[- 0-9]*\]/[inaudible]/g" |\
   sed -e 's/ - / /g' |\

@@ -44,7 +44,7 @@ for set in dev test train; do
           -e 's:<sil>::g' \
           -e 's:([^ ]*)$::' | \
       awk '{ $2 = "A"; print $0; }'
-  } | local/join_suffix.py > "${data_dir}/$set.orig/stm"
+  } | local/tedlium2/join_suffix.py > "${data_dir}/$set.orig/stm"
 
   # Prepare 'text' file
   # - {NOISE} -> [NOISE] : map the tags to match symbols in dictionary

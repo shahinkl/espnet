@@ -41,10 +41,10 @@ fi
 # while building segments
 
 find "${dwl_dir}" -iname '*.Headset-*.wav' | sort >"${dir}/wav.flist"
-n=$(wc -l "${dir}/wav.flist")
+n=$(cat "${dir}/wav.flist" | wc -l)
 
 echo "In total, ${n} headset files were found."
-[ ${n} -ne 687 ] &&
+[ $n -ne 687 ] &&
   echo "Warning: expected 687 (168 mtgs x 4 mics + 3 mtgs x 5 mics) data files, found ${n}"
 
 # (1a) Transcriptions preparation
@@ -98,7 +98,7 @@ join "${dir}/utt2spk" "${dir}/segments" |
            }
            $pu=$_[1]; $pt=$_[4];
          }' >"${dir}/segments_to_fix"
-if [ $(wc -l "${dir}/segments_to_fix") -gt 0 ]; then
+if [ $(cat "${dir}/segments_to_fix" | wc -l) -gt 0 ]; then
   echo "$0. Applying following fixes to segments"
   cat "${dir}/segments_to_fix"
   while read line; do

@@ -10,7 +10,7 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=-1
+stage=0
 stop_stage=0
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
@@ -167,36 +167,72 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   ### Task dependent. You have to make data the following preparation part by yourself.
   ### But you can utilize Kaldi recipes in most cases
   echo "Starting stage 0: Data preparation"
-  # 1. AMI
-  printf "\n\n Starting to prepare ami data ...\n"
-  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
+#  # 1. AMI
+#  printf "\n\n Starting to prepare ami data ...\n"
+#  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
+#
+#  # 2. COMMON VOICE
+#  printf "\n\n Starting to prepare common-voice data ...\n"
+#  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+#
+#  # 3. DIPCO
+#  printf "\n\n Starting to prepare dipco data ...\n"
+#  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
+#
+#  # 4. LIBRISPEECH
+#  printf "\n\n Starting to prepare librispeech data ...\n"
+#  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
+#    # use underscore-separated names in data directories.
+#    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
+#  done
+#
+#  # 5. TEDLIUM-2
+#  printf "\n\n Starting to prepare tedlium2 data ...\n"
+#  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
+#
+#  # 6. TEDLIUM-3
+#  printf "\n\n Starting to prepare tedlium3 data ...\n"
+#  local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
+#
+#  # 7. VOXFORGE
+#  printf "\n\n Starting to prepare voxforge data ...\n"
+#  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
-  # 2. COMMON VOICE
-  printf "\n\n Starting to prepare common-voice data ...\n"
-  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+  mkdir -p "${data_dir}/combined/train"
+  mkdir -p "${data_dir}/combined/dev"
+  mkdir -p "${data_dir}/combined/test"
 
-  # 3. DIPCO
-  printf "\n\n Starting to prepare dipco data ...\n"
-  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
+  utils/combine_data.sh "${data_dir}/combined/train" \
+    "${data_dir}/ami/ihm_train" \
+    "${data_dir}/commonvoice/train_data" \
+    "${data_dir}/dipco/dev_worn_stereo" \
+    "${data_dir}/dipco/eval_worn_stereo" \
+    "${data_dir}/librispeech/train_clean_100" \
+    "${data_dir}/librispeech/train_clean_360" \
+    "${data_dir}/librispeech/train_other_500" \
+    "${data_dir}/tedlium2/train" \
+    "${data_dir}/tedlium3/train" \
+    "${data_dir}/voxforge/all_en"
 
-  # 4. LIBRISPEECH
-  printf "\n\n Starting to prepare librispeech data ...\n"
-  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
-    # use underscore-separated names in data directories.
-    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
-  done
+  utils/combine_data.sh "${data_dir}/combined/dev" \
+    "${data_dir}/ami/ihm_dev" \
+    "${data_dir}/commonvoice/dev_data" \
+    "${data_dir}/dipco/dev_worn" \
+    "${data_dir}/dipco/dev_beamformit_ref" \
+    "${data_dir}/librispeech/dev_clean" \
+    "${data_dir}/librispeech/dev_other" \
+    "${data_dir}/tedlium2/dev" \
+    "${data_dir}/tedlium3/dev"
 
-  # 5. TEDLIUM-2
-  printf "\n\n Starting to prepare tedlium2 data ...\n"
-  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
-
-  # 6. TEDLIUM-3
-  printf "\n\n Starting to prepare tedlium3 data ...\n"
-  local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
-
-  # 7. VOXFORGE
-  printf "\n\n Starting to prepare voxforge data ...\n"
-  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
+  utils/combine_data.sh "${data_dir}/combined/test" \
+    "${data_dir}/ami/ihm_eval" \
+    "${data_dir}/commonvoice/test_data" \
+    "${data_dir}/dipco/eval_worn" \
+    "${data_dir}/dipco/eval_beamformit_ref" \
+    "${data_dir}/librispeech/test_clean" \
+    "${data_dir}/librispeech/test_other" \
+    "${data_dir}/tedlium2/test" \
+    "${data_dir}/tedlium3/test"
 
   printf "\n\n Completed stage 0: Data preparation\n"
 fi

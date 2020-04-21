@@ -10,7 +10,7 @@
 . ./path.sh
 
 #check existing directories
-if [ $# != 3 ] || [ $2 != "ihm" ]; then
+if [ $# != 4 ] || [ $2 != "ihm" ]; then
   echo "Usage: $0 /path/to/AMI ihm (dev|eval)"
   exit 1
 fi

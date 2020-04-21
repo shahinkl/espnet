@@ -38,7 +38,7 @@ done
 # only use left channel for worn mic recognition
 # you can use both left and right channels for training
 for dset in dev eval; do
-  utils/copy_data_dir.sh "${data_dir}/${dset}_worn data/${dset}_worn_stereo"
+  utils/copy_data_dir.sh "${data_dir}/${dset}_worn" "${data_dir}/${dset}_worn_stereo"
   grep "\.L-" "${data_dir}/${dset}_worn_stereo/text" > "${data_dir}/${dset}_worn/text"
   utils/fix_data_dir.sh "${data_dir}/${dset}_worn"
 done

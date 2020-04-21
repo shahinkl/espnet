@@ -45,7 +45,7 @@ find "${dwl_dir}" -iname '*.Headset-*.wav' | sort >"${dir}/wav.flist"
 n=$(wc -l "${dir}/wav.flist")
 
 echo "In total, ${n} headset files were found."
-[ "${n}" -ne 687 ] &&
+[ ${n} -ne 687 ] &&
   echo "Warning: expected 687 (168 mtgs x 4 mics + 3 mtgs x 5 mics) data files, found $n"
 
 # (1a) Transcriptions preparation

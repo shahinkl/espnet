@@ -166,25 +166,25 @@ fi
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   ### Task dependent. You have to make data the following preparation part by yourself.
   ### But you can utilize Kaldi recipes in most cases
-#  echo "Starting stage 0: Data preparation"
-#  # 1. AMI
-#  printf "\n\n Starting to prepare ami data ...\n"
-#  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
-#
-#  # 2. COMMON VOICE
-#  printf "\n\n Starting to prepare common-voice data ...\n"
-#  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+  echo "Starting stage 0: Data preparation"
+  # 1. AMI
+  printf "\n\n Starting to prepare ami data ...\n"
+  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
 
-#  # 3. DIPCO
-#  printf "\n\n Starting to prepare dipco data ...\n"
-#  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
-#
-#  # 4. LIBRISPEECH
-#  printf "\n\n Starting to prepare librispeech data ...\n"
-#  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
-#    # use underscore-separated names in data directories.
-#    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
-#  done
+  # 2. COMMON VOICE
+  printf "\n\n Starting to prepare common-voice data ...\n"
+  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+
+  # 3. DIPCO
+  printf "\n\n Starting to prepare dipco data ...\n"
+  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
+
+  # 4. LIBRISPEECH
+  printf "\n\n Starting to prepare librispeech data ...\n"
+  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
+    # use underscore-separated names in data directories.
+    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
+  done
 
   # 5. TEDLIUM-2
   printf "\n\n Starting to prepare tedlium2 data ...\n"
@@ -195,6 +195,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
 
   # 7. VOXFORGE
+  printf "\n\n Starting to prepare voxforge data ...\n"
   local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
   printf "\n\n Completed stage 0: Data preparation\n"

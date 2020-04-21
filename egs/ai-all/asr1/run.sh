@@ -166,14 +166,14 @@ fi
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   ### Task dependent. You have to make data the following preparation part by yourself.
   ### But you can utilize Kaldi recipes in most cases
-  echo "Starting stage 0: Data preparation"
-  # 1. AMI
-  printf "\n\n Starting to prepare ami data ...\n"
-  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
-
-  # 2. COMMON VOICE
-  printf "\n\n Starting to prepare common-voice data ...\n"
-  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+#  echo "Starting stage 0: Data preparation"
+#  # 1. AMI
+#  printf "\n\n Starting to prepare ami data ...\n"
+#  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
+#
+#  # 2. COMMON VOICE
+#  printf "\n\n Starting to prepare common-voice data ...\n"
+#  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
 
   # 3. DIPCO
   printf "\n\n Starting to prepare dipco data ...\n"

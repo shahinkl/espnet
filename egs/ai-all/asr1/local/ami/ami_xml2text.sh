@@ -8,11 +8,11 @@ if [ $# -ne 1 ]; then
 fi
 
 adir=$1
-wdir=data/local/annotations
+wdir="${adir}/annotations"
 
-[ ! -f $adir/annotations/AMI-metadata.xml ] && echo "$0: File $adir/annotations/AMI-metadata.xml no found." && exit 1;
+[ ! -f" ${wdir}/AMI-metadata.xml" ] && echo "$0: File ${wdir}/AMI-metadata.xml no found." && exit 1;
 
-mkdir -p $wdir/log
+mkdir -p "$wdir/log"
 
 JAVA_VER=$(java -version 2>&1 | sed 's/java version "\(.*\)\.\(.*\)\..*"/\1\2/; 1q')
 

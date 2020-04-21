@@ -253,6 +253,8 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     "librispeech/test_other" \
     "tedlium2/test" \
     "tedlium3/test"; do
+
+    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
     steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbankdir}
     utils/fix_data_dir.sh ${data_dir}/${x}
   done

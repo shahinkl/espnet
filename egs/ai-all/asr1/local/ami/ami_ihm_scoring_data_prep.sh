@@ -84,12 +84,8 @@ cat "${dir}/wav.scp" |
 
 awk '{print $1}' "${dir}/segments" |
   perl -ane '$_ =~ m:^(\S+)([FM][A-Z]{0,2}[0-9]{3}[A-Z]*)(\S+)$: || die "segments: bad label $_";
-          print "$1$2$3 $1$2\n";' >"${dir}/utt2spk " || exit 1
+          print "$1$2$3 $1$2\n";' >"${dir}/utt2spk" || exit 1
 
-echo ".............. Sorting failure ................"
-pwd
-ls -lrt "${dir}"
-echo ".............. Sorting failure ................"
 sort -k 2 "${dir}/utt2spk" | utils/utt2spk_to_spk2utt.pl >"${dir}/spk2utt" || exit 1
 
 #check and correct the case when segment timings for given speaker overlap themself

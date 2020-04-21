@@ -10,8 +10,8 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=0
-stop_stage=1
+stage=1
+stop_stage=2
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
 ngpu=8
@@ -358,19 +358,18 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   echo "stage 3: LM Preparation"
   lmdwl_dir=${data_dir}/lm/downloads
   mkdir -p ${lmdwl_dir}
-  lmdwl_dir=data/local/lm_train_${bpemode}${nbpe}
+  #  lmdwl_dir=data/local/lm_train_${bpemode}${nbpe}
   # use external data
-  if [ ! -e data/local/lm_train/librispeech-lm-norm.txt.gz ]; then
-    wget http://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz -P data/local/lm_train/
+  if [ ! -e ${lmdwl_dir}/librispeech-lm-norm.txt.gz ]; then
+    wget http://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz -P ${lmdwl_dir}
   fi
   if [ ! -e ${lmdwl_dir} ]; then
     mkdir -p ${lmdwl_dir}
-    cut -f 2- -d" " data/${train_set}/text | gzip -c >data/local/lm_train/${train_set}_text.gz
+    cut -f 2- -d" " ${train_set}/text | gzip -c >${lmdwl_dir}/${train_set}_text.gz
     # combine external text and transcriptions and shuffle them with seed 777
-    zcat data/local/lm_train/librispeech-lm-norm.txt.gz data/local/lm_train/${train_set}_text.gz |
-      spm_encode --model=${bpemodel}.model --output_format=piece >${lmdwl_dir}/train.txt
-    cut -f 2- -d" " data/${train_dev}/text | spm_encode --model=${bpemodel}.model --output_format=piece \
-      >${lmdwl_dir}/valid.txt
+    zcat ${lmdwl_dir}/librispeech-lm-norm.txt.gz ${lmdwl_dir}/${train_set}_text.gz |
+      spm_encode --model=${bpemodel}.model --output_format=piece >${data_dir}/lm/train.txt
+    cut -f 2- -d" " ${dev_set}/text | spm_encode --model=${bpemodel}.model --output_format=piece >${data_dir}/lm/valid.txt
   fi
   ${cuda_cmd} --gpu ${ngpu} ${lmexpdir}/train.log \
     lm_train.py \
@@ -380,11 +379,11 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
     --verbose 1 \
     --outdir ${lmexpdir} \
     --tensorboard-dir tensorboard/${lmexpname} \
-    --train-label ${lmdwl_dir}/train.txt \
-    --valid-label ${lmdwl_dir}/valid.txt \
+    --train-label ${data_dir}/lm/train.txt \
+    --valid-label ${data_dir}/lm/valid.txt \
     --resume ${lm_resume} \
     --dict ${dict} \
-    --dump-hdf5-path ${lmdwl_dir}
+    --dump-hdf5-path ${data_dir}/lm
 fi
 
 if [ -z ${tag} ]; then

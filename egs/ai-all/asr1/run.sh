@@ -192,7 +192,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
 
   # 6. TEDLIUM-3
   printf "\n\n Starting to prepare tedlium3 data ...\n"
-  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
+  local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
 
   # 7. VOXFORGE
   local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"

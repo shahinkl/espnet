@@ -10,8 +10,8 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=0
-stop_stage=0
+stage=1
+stop_stage=1
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
 ngpu=8
@@ -167,43 +167,97 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   ### Task dependent. You have to make data the following preparation part by yourself.
   ### But you can utilize Kaldi recipes in most cases
   echo "Starting stage 0: Data preparation"
-#  # 1. AMI
-#  printf "\n\n Starting to prepare ami data ...\n"
-#  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
-#
-#  # 2. COMMON VOICE
-#  printf "\n\n Starting to prepare common-voice data ...\n"
-#  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
-#
-#  # 3. DIPCO
-#  printf "\n\n Starting to prepare dipco data ...\n"
-#  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
-#
-#  # 4. LIBRISPEECH
-#  printf "\n\n Starting to prepare librispeech data ...\n"
-#  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
-#    # use underscore-separated names in data directories.
-#    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
-#  done
-#
-#  # 5. TEDLIUM-2
-#  printf "\n\n Starting to prepare tedlium2 data ...\n"
-#  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
-#
-#  # 6. TEDLIUM-3
-#  printf "\n\n Starting to prepare tedlium3 data ...\n"
-#  local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
-#
-#  # 7. VOXFORGE
-#  printf "\n\n Starting to prepare voxforge data ...\n"
-#  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
+  # 1. AMI
+  printf "\n\n Starting to prepare ami data ...\n"
+  local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
 
+  # 2. COMMON VOICE
+  printf "\n\n Starting to prepare common-voice data ...\n"
+  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+
+  # 3. DIPCO
+  printf "\n\n Starting to prepare dipco data ...\n"
+  local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
+
+  # 4. LIBRISPEECH
+  printf "\n\n Starting to prepare librispeech data ...\n"
+  for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
+    # use underscore-separated names in data directories.
+    local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
+  done
+
+  # 5. TEDLIUM-2
+  printf "\n\n Starting to prepare tedlium2 data ...\n"
+  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
+
+  # 6. TEDLIUM-3
+  printf "\n\n Starting to prepare tedlium3 data ...\n"
+  local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
+
+  # 7. VOXFORGE
+  printf "\n\n Starting to prepare voxforge data ...\n"
+  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
+
+  printf "\n\n Completed stage 0: Data preparation\n"
+fi
+
+#feat_tr_dir=${dumpdir}/${train_set}/delta${do_delta}
+#mkdir -p ${feat_tr_dir}
+#feat_dt_dir=${dumpdir}/${train_dev}/delta${do_delta}
+#mkdir -p ${feat_dt_dir}
+
+if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
+  ### Task dependent. You have to design training and dev sets by yourself.
+  ### But you can utilize Kaldi recipes in most cases
+  echo "stage 1: Feature Generation"
+
+  mkdir -p "${data_dir}/combined/fbank"
   mkdir -p "${data_dir}/combined/train"
   mkdir -p "${data_dir}/combined/dev"
   mkdir -p "${data_dir}/combined/test"
+  mkdir -p "${data_dir}/combined/train_org"
+  mkdir -p "${data_dir}/combined/dev_org"
+  mkdir -p "${data_dir}/combined/test_org"
 
-  utils/combine_data.sh "${data_dir}/combined/train" \
-    "${data_dir}/ami/ihm_train" \
+  fbankdir="${data_dir}/combined/fbank"
+  train_set_org="${data_dir}/combined/train_org"
+  dev_set_org="${data_dir}/combined/dev_org"
+  train_set="${data_dir}/combined/train"
+  dev_set="${data_dir}/combined/dev"
+  test_set="${data_dir}/combined/test"
+
+  # TRAIN
+  for x in "ami/ihm_train" \
+    "commonvoice/train_data" \
+    "dipco/dev_worn_stereo" \
+    "dipco/eval_worn_stereo" \
+    "librispeech/train_clean_100" \
+    "librispeech/train_clean_360" \
+    "librispeech/train_other_500" \
+    "tedlium2/train" \
+    "tedlium3/train" \
+    "voxforge/all_en" \
+    "ami/ihm_dev" \
+    "commonvoice/dev_data" \
+    "dipco/dev_worn" \
+    "dipco/dev_beamformit_ref" \
+    "librispeech/dev_clean" \
+    "librispeech/dev_other" \
+    "tedlium2/dev" \
+    "tedlium3/dev" \
+    "ami/ihm_eval" \
+    "commonvoice/test_data" \
+    "dipco/eval_worn" \
+    "dipco/eval_beamformit_ref" \
+    "librispeech/test_clean" \
+    "librispeech/test_other" \
+    "tedlium2/test" \
+    "tedlium3/test"; do
+    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbankdir}
+    utils/fix_data_dir.sh ${data_dir}/${x}
+  done
+
+  utils/combine_data.sh --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
     "${data_dir}/commonvoice/train_data" \
     "${data_dir}/dipco/dev_worn_stereo" \
     "${data_dir}/dipco/eval_worn_stereo" \
@@ -214,8 +268,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     "${data_dir}/tedlium3/train" \
     "${data_dir}/voxforge/all_en"
 
-  utils/combine_data.sh "${data_dir}/combined/dev" \
-    "${data_dir}/ami/ihm_dev" \
+  utils/combine_data.sh --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
     "${data_dir}/commonvoice/dev_data" \
     "${data_dir}/dipco/dev_worn" \
     "${data_dir}/dipco/dev_beamformit_ref" \
@@ -224,8 +277,7 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     "${data_dir}/tedlium2/dev" \
     "${data_dir}/tedlium3/dev"
 
-  utils/combine_data.sh "${data_dir}/combined/test" \
-    "${data_dir}/ami/ihm_eval" \
+  utils/combine_data.sh --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
     "${data_dir}/commonvoice/test_data" \
     "${data_dir}/dipco/eval_worn" \
     "${data_dir}/dipco/eval_beamformit_ref" \
@@ -234,58 +286,37 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     "${data_dir}/tedlium2/test" \
     "${data_dir}/tedlium3/test"
 
-  printf "\n\n Completed stage 0: Data preparation\n"
-fi
-
-feat_tr_dir=${dumpdir}/${train_set}/delta${do_delta}
-mkdir -p ${feat_tr_dir}
-feat_dt_dir=${dumpdir}/${train_dev}/delta${do_delta}
-mkdir -p ${feat_dt_dir}
-if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
-  ### Task dependent. You have to design training and dev sets by yourself.
-  ### But you can utilize Kaldi recipes in most cases
-  echo "stage 1: Feature Generation"
-  fbankdir=fbank
-  # Generate the fbank features; by default 80-dimensional fbanks with pitch on each frame
-  for x in dev_clean test_clean dev_other test_other train_clean_100 train_clean_360 train_other_500; do
-    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true \
-      data/${x} exp/make_fbank/${x} ${fbankdir}
-    utils/fix_data_dir.sh data/${x}
-  done
-
-  utils/combine_data.sh --extra_files utt2num_frames data/${train_set}_org data/train_clean_100 data/train_clean_360 data/train_other_500
-  utils/combine_data.sh --extra_files utt2num_frames data/${train_dev}_org data/dev_clean data/dev_other
-
   # remove utt having more than 3000 frames
   # remove utt having more than 400 characters
-  remove_longshortdata.sh --maxframes 3000 --maxchars 400 data/${train_set}_org data/${train_set}
-  remove_longshortdata.sh --maxframes 3000 --maxchars 400 data/${train_dev}_org data/${train_dev}
+  remove_longshortdata.sh --maxframes 3000 --maxchars 400 ${train_set_org} ${train_set}
+  remove_longshortdata.sh --maxframes 3000 --maxchars 400 ${dev_set_org} ${dev_set}
 
-  # compute global CMVN
-  compute-cmvn-stats scp:data/${train_set}/feats.scp data/${train_set}/cmvn.ark
-
-  # dump features for training
-  if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d ${feat_tr_dir}/storage ]; then
-    utils/create_split_dir.pl \
-      /export/b{14,15,16,17}/${USER}/espnet-data/egs/librispeech/asr1/dump/${train_set}/delta${do_delta}/storage \
-      ${feat_tr_dir}/storage
-  fi
-  if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d ${feat_dt_dir}/storage ]; then
-    utils/create_split_dir.pl \
-      /export/b{14,15,16,17}/${USER}/espnet-data/egs/librispeech/asr1/dump/${train_dev}/delta${do_delta}/storage \
-      ${feat_dt_dir}/storage
-  fi
-  dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
-    data/${train_set}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/train ${feat_tr_dir}
-  dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
-    data/${train_dev}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/dev ${feat_dt_dir}
-  for rtask in ${recog_set}; do
-    feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}
-    mkdir -p ${feat_recog_dir}
-    dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
-      data/${rtask}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/recog/${rtask} \
-      ${feat_recog_dir}
-  done
+#  # compute global CMVN
+#  compute-cmvn-stats scp:data/${train_set}/feats.scp data/${train_set}/cmvn.ark
+#
+#  # dump features for training
+#  if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d ${feat_tr_dir}/storage ]; then
+#    utils/create_split_dir.pl \
+#      /export/b{14,15,16,17}/${USER}/espnet-data/egs/librispeech/asr1/dump/${train_set}/delta${do_delta}/storage \
+#      ${feat_tr_dir}/storage
+#  fi
+#  if [[ $(hostname -f) == *.clsp.jhu.edu ]] && [ ! -d ${feat_dt_dir}/storage ]; then
+#    utils/create_split_dir.pl \
+#      /export/b{14,15,16,17}/${USER}/espnet-data/egs/librispeech/asr1/dump/${train_dev}/delta${do_delta}/storage \
+#      ${feat_dt_dir}/storage
+#  fi
+#
+#  dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
+#    data/${train_set}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/train ${feat_tr_dir}
+#  dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
+#    data/${train_dev}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/dev ${feat_dt_dir}
+#  for rtask in ${recog_set}; do
+#    feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}
+#    mkdir -p ${feat_recog_dir}
+#    dump.sh --cmd "$train_cmd" --nj ${nj} --do_delta ${do_delta} \
+#      data/${rtask}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/recog/${rtask} \
+#      ${feat_recog_dir}
+#  done
 fi
 
 dict=data/lang_char/${train_set}_${bpemode}${nbpe}_units.txt

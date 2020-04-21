@@ -43,5 +43,5 @@ local/ami/ami_split_segments.pl "${wdir}/transcripts1" "${wdir}/transcripts2" &>
 
 # make final train/dev/eval splits
 for dset in train eval dev; do
-  grep -f local/ami/split_${dset}.orig "${wdir}/transcripts2" >"${wdir}/${dset}.txt"
+  grep -f "local/ami/split_${dset}.orig" "${wdir}/transcripts2" >"${wdir}/${dset}.txt"
 done

@@ -70,6 +70,13 @@ lm_n_average=0
 # if false, the last `lm_n_average` language models will be averaged.
 use_lm_valbest_average=false
 
+# bpemode (unigram or bpe)
+nbpe=5000
+bpemode=unigram
+
+# exp tag
+tag="" # tag for managing experiments.
+
 # General configs
 dwl_dir=downloads
 data_dir=data
@@ -90,11 +97,21 @@ mkdir -p "${data_dir}/librispeech"
 mkdir -p "${data_dir}/tedlium2"
 mkdir -p "${data_dir}/tedlium3"
 mkdir -p "${data_dir}/voxforge"
+mkdir -p "${data_dir}/combined/fbank"
+mkdir -p "${data_dir}/combined/train"
+mkdir -p "${data_dir}/combined/dev"
+mkdir -p "${data_dir}/combined/test"
+mkdir -p "${data_dir}/combined/train_org"
+mkdir -p "${data_dir}/combined/dev_org"
+mkdir -p "${data_dir}/combined/test_org"
 
 # AMI
 mic=ihm
 # COMMONVOICE
 data_url_cv=https://voice-prod-bundler-ee1969a6ce8178826482b88e843c335139bd3fb4.s3.amazonaws.com/cv-corpus-4-2019-12-10/$lang.tar.gz
+train_data_dir=train_data
+dev_data_dir=dev_data
+test_data_dir=test_data
 # DIPCO
 data_url_dc=https://s3.amazonaws.com/dipco/DiPCo.tgz
 enhancement=beamformit
@@ -105,14 +122,16 @@ data_url_td2=http://www.openslr.org/resources/19/TEDLIUM_release2.tar.gz
 # TEDLIUM 3
 data_url_td3=http://www.openslr.org/resources/51/TEDLIUM_release-3.tgz
 data_type=legacy
-# VOXFORGE
+# COMBINED
+fbankdir="${data_dir}/combined/fbank"
+train_set_org="${data_dir}/combined/train_org"
+dev_set_org="${data_dir}/combined/dev_org"
+train_set="${data_dir}/combined/train"
+dev_set="${data_dir}/combined/dev"
+test_set="${data_dir}/combined/test"
 
-# bpemode (unigram or bpe)
-nbpe=5000
-bpemode=unigram
-
-# exp tag
-tag="" # tag for managing experiments.
+dict="${data_dir}"/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
+bpemodel="${data_dir}"/lang_char/${train_set}_${bpemode}${nbpe}
 
 . utils/parse_options.sh || exit 1
 
@@ -122,42 +141,38 @@ set -e
 set -u
 set -o pipefail
 
-train_set=train_data
-train_dev=dev_data
-test_set=test_data
-
 recog_set="test_clean test_other dev_clean dev_other"
 
 if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
   echo "Starting stage -1: Data Download"
   # 1. AMI
-  printf "\n\n Starting to download ami dataset ...\n"
+  printf "\n\nStarting to download ami dataset ...\n"
   local/ami/download_and_arrange.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami" &
   sleep 15
   # 2. COMMON VOICE
-  printf "\n\n Starting to download common-voice dataset ...\n"
+  printf "\n\nStarting to download common-voice dataset ...\n"
   local/commonvoice/download_and_untar.sh "${dwl_dir}/commonvoice" ${data_url_cv} ${lang}.tar.gz &
   sleep 15
   # 3. DIPCO
-  printf "\n\n Starting to download dipco dataset ...\n"
+  printf "\n\nStarting to download dipco dataset ...\n"
   local/dipco/download_and_untar.sh "${dwl_dir}/dipco" ${data_url_dc} DiPCo.tgz &
   sleep 15
   # 4. LIBRISPEECH
-  printf "\n\n Starting to download librispeech dataset ...\n"
+  printf "\n\nStarting to download librispeech dataset ...\n"
   for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
     local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
     sleep 90
   done
   # 5. TEDLIUM 2
-  printf "\n\n Starting to download tedlium-2 dataset ...\n"
+  printf "\n\nStarting to download tedlium-2 dataset ...\n"
   local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
   sleep 15
   # 6. TEDLIUM 3
-  printf "\n\n Starting to download tedlium-3 dataset ...\n"
+  printf "\n\nStarting to download tedlium-3 dataset ...\n"
   local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} TEDLIUM_release-3.tgz &
   sleep 15
   # 7. VOXFORGE
-  printf "\n\n Starting to download voxforge dataset ...\n"
+  printf "\n\nStarting to download voxforge dataset ...\n"
   local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
   wait # Wait for all process to complete
   printf "\n\n Completed stage -1: Data Download\n"
@@ -168,34 +183,34 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
   ### But you can utilize Kaldi recipes in most cases
   echo "Starting stage 0: Data preparation"
   # 1. AMI
-  printf "\n\n Starting to prepare ami data ...\n"
+  printf "\n\nStarting to prepare ami data ...\n"
   local/ami/prepare_data.sh "${mic}" "${dwl_dir}/ami" "${data_dir}/ami"
 
   # 2. COMMON VOICE
-  printf "\n\n Starting to prepare common-voice data ...\n"
-  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_set}" "${train_dev}" "${test_set}"
+  printf "\n\nStarting to prepare common-voice data ...\n"
+  local/commonvoice/prepare_data.sh "${dwl_dir}/commonvoice" "${data_dir}/commonvoice" "${lang}" "${train_data_dir}" "${dev_data_dir}" "${test_data_dir}"
 
   # 3. DIPCO
-  printf "\n\n Starting to prepare dipco data ...\n"
+  printf "\n\nStarting to prepare dipco data ...\n"
   local/dipco/prepare_data.sh "${dwl_dir}/dipco" "${data_dir}/dipco" "$enhancement"
 
   # 4. LIBRISPEECH
-  printf "\n\n Starting to prepare librispeech data ...\n"
+  printf "\n\nStarting to prepare librispeech data ...\n"
   for part in dev-clean test-clean dev-other test-other train-clean-100 train-clean-360 train-other-500; do
     # use underscore-separated names in data directories.
     local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
   done
 
   # 5. TEDLIUM-2
-  printf "\n\n Starting to prepare tedlium2 data ...\n"
+  printf "\n\nStarting to prepare tedlium2 data ...\n"
   local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
 
   # 6. TEDLIUM-3
-  printf "\n\n Starting to prepare tedlium3 data ...\n"
+  printf "\n\nStarting to prepare tedlium3 data ...\n"
   local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
 
   # 7. VOXFORGE
-  printf "\n\n Starting to prepare voxforge data ...\n"
+  printf "\n\nStarting to prepare voxforge data ...\n"
   local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
   printf "\n\n Completed stage 0: Data preparation\n"
@@ -210,21 +225,6 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   ### Task dependent. You have to design training and dev sets by yourself.
   ### But you can utilize Kaldi recipes in most cases
   echo "stage 1: Feature Generation"
-
-  mkdir -p "${data_dir}/combined/fbank"
-  mkdir -p "${data_dir}/combined/train"
-  mkdir -p "${data_dir}/combined/dev"
-  mkdir -p "${data_dir}/combined/test"
-  mkdir -p "${data_dir}/combined/train_org"
-  mkdir -p "${data_dir}/combined/dev_org"
-  mkdir -p "${data_dir}/combined/test_org"
-
-  fbankdir="${data_dir}/combined/fbank"
-  train_set_org="${data_dir}/combined/train_org"
-  dev_set_org="${data_dir}/combined/dev_org"
-  train_set="${data_dir}/combined/train"
-  dev_set="${data_dir}/combined/dev"
-  test_set="${data_dir}/combined/test"
 
   # TRAIN
   for x in "ami/ihm_train" \
@@ -261,8 +261,8 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
   utils/combine_data.sh --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
     "${data_dir}/commonvoice/train_data" \
-    "${data_dir}/dipco/dev_worn_stereo" \
-    "${data_dir}/dipco/eval_worn_stereo" \
+    "${data_dir}/dipco/dev_worn" \
+    "${data_dir}/dipco/eval_worn" \
     "${data_dir}/librispeech/train_clean_100" \
     "${data_dir}/librispeech/train_clean_360" \
     "${data_dir}/librispeech/train_other_500" \
@@ -272,7 +272,6 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
   utils/combine_data.sh --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
     "${data_dir}/commonvoice/dev_data" \
-    "${data_dir}/dipco/dev_worn" \
     "${data_dir}/dipco/dev_beamformit_ref" \
     "${data_dir}/librispeech/dev_clean" \
     "${data_dir}/librispeech/dev_other" \
@@ -281,7 +280,6 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
   utils/combine_data.sh --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
     "${data_dir}/commonvoice/test_data" \
-    "${data_dir}/dipco/eval_worn" \
     "${data_dir}/dipco/eval_beamformit_ref" \
     "${data_dir}/librispeech/test_clean" \
     "${data_dir}/librispeech/test_other" \
@@ -321,30 +319,31 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 #  done
 fi
 
-dict=data/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
-bpemodel=data/lang_char/${train_set}_${bpemode}${nbpe}
-echo "dictionary: ${dict}"
 if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
   ### Task dependent. You have to check non-linguistic symbols used in the corpus.
   echo "stage 2: Dictionary and Json Data Preparation"
-  mkdir -p data/lang_char/
+  mkdir -p "${data_dir}"/lang_char/
   echo "<unk> 1" >${dict} # <unk> must be 1, 0 will be used for "blank" in CTC
-  cut -f 2- -d" " data/${train_set}/text >data/lang_char/input.txt
+  cut -f 2- -d" " ${train_set}/text >data/lang_char/input.txt
   spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
   spm_encode --model=${bpemodel}.model --output_format=piece <data/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >>${dict}
   wc -l ${dict}
 
   # make json labels
-  data2json.sh --feat ${feat_tr_dir}/feats.scp --bpecode ${bpemodel}.model \
-    data/${train_set} ${dict} >${feat_tr_dir}/data_${bpemode}${nbpe}.json
-  data2json.sh --feat ${feat_dt_dir}/feats.scp --bpecode ${bpemodel}.model \
-    data/${train_dev} ${dict} >${feat_dt_dir}/data_${bpemode}${nbpe}.json
+  data2json.sh --feat ${train_set}/feats.scp --bpecode ${bpemodel}.model \
+    ${train_set} ${dict} >${train_set}/data_${bpemode}${nbpe}.json
 
-  for rtask in ${recog_set}; do
-    feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}
-    data2json.sh --feat ${feat_recog_dir}/feats.scp --bpecode ${bpemodel}.model \
-      data/${rtask} ${dict} >${feat_recog_dir}/data_${bpemode}${nbpe}.json
-  done
+  data2json.sh --feat ${dev_set}/feats.scp --bpecode ${bpemodel}.model \
+    ${dev_set} ${dict} >${dev_set}/data_${bpemode}${nbpe}.json
+
+  data2json.sh --feat ${test_set}/feats.scp --bpecode ${bpemodel}.model \
+    ${test_set} ${dict} >${test_set}/data_${bpemode}${nbpe}.json
+
+#  for rtask in ${recog_set}; do
+#    feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}
+#    data2json.sh --feat ${feat_recog_dir}/feats.scp --bpecode ${bpemodel}.model \
+#      data/${rtask} ${dict} >${feat_recog_dir}/data_${bpemode}${nbpe}.json
+#  done
 fi
 
 # You can skip this and remove --rnnlm option in the recognition (stage 5)
@@ -357,6 +356,8 @@ mkdir -p ${lmexpdir}
 
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   echo "stage 3: LM Preparation"
+  lmdwl_dir=${data_dir}/lm/downloads
+  mkdir -p ${lmdwl_dir}
   lmdwl_dir=data/local/lm_train_${bpemode}${nbpe}
   # use external data
   if [ ! -e data/local/lm_train/librispeech-lm-norm.txt.gz ]; then
@@ -416,8 +417,8 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
     --minibatches ${N} \
     --verbose ${verbose} \
     --resume ${resume} \
-    --train-json ${feat_tr_dir}/data_${bpemode}${nbpe}.json \
-    --valid-json ${feat_dt_dir}/data_${bpemode}${nbpe}.json
+    --train-json ${train_set}/data_${bpemode}${nbpe}.json \
+    --valid-json ${dev_set}/data_${bpemode}${nbpe}.json
 fi
 
 if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
@@ -477,7 +478,7 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
         --ngpu ${ngpu} \
         --backend ${backend} \
         --batchsize 0 \
-        --recog-json ${feat_recog_dir}/split${nj}utt/data_${bpemode}${nbpe}.JOB.json \
+        --recog-json ${test_set}/split${nj}utt/data_${bpemode}${nbpe}.JOB.json \
         --result-label ${expdir}/${decode_dir}/data.JOB.json \
         --model ${expdir}/results/${recog_model} \
         --rnnlm ${lmexpdir}/${lang_model} \

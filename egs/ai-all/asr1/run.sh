@@ -319,13 +319,13 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
   wc -l ${dict}
 
   # make json labels
-  data2json.sh --feat ${train_set}/feats.scp --bpecode ${bpemodel}.model \
+  data2json.sh --nj ${nj} --feat ${train_set}/feats.scp --bpecode ${bpemodel}.model \
     ${train_set} ${dict} >${train_set}/data_${bpemode}${nbpe}.json
 
-  data2json.sh --feat ${dev_set}/feats.scp --bpecode ${bpemodel}.model \
+  data2json.sh --nj ${nj} --feat ${dev_set}/feats.scp --bpecode ${bpemodel}.model \
     ${dev_set} ${dict} >${dev_set}/data_${bpemode}${nbpe}.json
 
-  data2json.sh --feat ${test_set}/feats.scp --bpecode ${bpemodel}.model \
+  data2json.sh --nj ${nj} --feat ${test_set}/feats.scp --bpecode ${bpemodel}.model \
     ${test_set} ${dict} >${test_set}/data_${bpemode}${nbpe}.json
 
 #  for rtask in ${recog_set}; do

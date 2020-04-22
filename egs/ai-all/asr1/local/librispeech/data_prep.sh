@@ -15,8 +15,8 @@ dst=$2
 
 # all utterances are FLAC compressed
 if ! which flac >&/dev/null; then
-   echo "Please install 'flac' on ALL worker nodes!"
-   exit 1
+  echo "Please install 'flac' on ALL worker nodes!"
+  exit 1
 fi
 
 spk_file=$src/../SPEAKERS.TXT
@@ -26,15 +26,18 @@ mkdir -p $dst || exit 1
 [ ! -d $src ] && echo "$0: no such directory $src" && exit 1
 [ ! -f $spk_file ] && echo "$0: expected file $spk_file to exist" && exit 1
 
-
-wav_scp=$dst/wav.scp; [[ -f "$wav_scp" ]] && rm $wav_scp
-trans=$dst/text; [[ -f "$trans" ]] && rm $trans
-utt2spk=$dst/utt2spk; [[ -f "$utt2spk" ]] && rm $utt2spk
-spk2gender=$dst/spk2gender; [[ -f $spk2gender ]] && rm $spk2gender
+wav_scp=$dst/wav.scp
+[[ -f "$wav_scp" ]] && rm $wav_scp
+trans=$dst/text
+[[ -f "$trans" ]] && rm $trans
+utt2spk=$dst/utt2spk
+[[ -f "$utt2spk" ]] && rm $utt2spk
+spk2gender=$dst/spk2gender
+[[ -f $spk2gender ]] && rm $spk2gender
 
 for reader_dir in $(find -L $src -mindepth 1 -maxdepth 1 -type d | sort); do
   reader=$(basename $reader_dir)
-  if ! [ $reader -eq $reader ]; then  # not integer.
+  if ! [ $reader -eq $reader ]; then # not integer.
     echo "$0: unexpected subdirectory name $reader"
     exit 1
   fi
@@ -52,11 +55,11 @@ for reader_dir in $(find -L $src -mindepth 1 -maxdepth 1 -type d | sort); do
       exit 1
     fi
 
-    find -L $chapter_dir/ -iname "*.flac" | sort | xargs -I% basename % .flac | \
-      awk -v "dir=$chapter_dir" '{printf "%s flac -c -d -s %s/%s.flac |\n", $0, dir, $0}' >>$wav_scp|| exit 1
+    find -L $chapter_dir/ -iname "*.flac" | sort | xargs -I% basename % .flac |
+      awk -v "dir=$chapter_dir" '{printf "%s flac -c -d -s %s/%s.flac |\n", $0, dir, $0}' >>$wav_scp || exit 1
 
     chapter_trans=$chapter_dir/${reader}-${chapter}.trans.txt
-    [ ! -f  $chapter_trans ] && echo "$0: expected file $chapter_trans to exist" && exit 1
+    [ ! -f $chapter_trans ] && echo "$0: expected file $chapter_trans to exist" && exit 1
     cat $chapter_trans >>$trans
 
     # NOTE: For now we are using per-chapter utt2spk. That is each chapter is considered
@@ -75,10 +78,11 @@ utils/utt2spk_to_spk2utt.pl <$utt2spk >$spk2utt || exit 1
 
 ntrans=$(wc -l <$trans)
 nutt2spk=$(wc -l <$utt2spk)
-! [ "$ntrans" -eq "$nutt2spk" ] && \
+! [ "$ntrans" -eq "$nutt2spk" ] &&
   echo "Inconsistent #transcripts($ntrans) and #utt2spk($nutt2spk)" && exit 1
 
 utils/validate_data_dir.sh --no-feats $dst || exit 1
+utils/fix_data_dir.sh $dst || exit 1
 
 echo "$0: successfully prepared data in $dst"
 

@@ -10,8 +10,8 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=0
-stop_stage=3
+stage=1
+stop_stage=100
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
 ngpu=8
@@ -227,39 +227,39 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   echo "stage 1: Feature Generation"
 
   # TRAIN
-  for x in "ami/ihm_train" \
-    "commonvoice/train" \
-    "dipco/dev_worn" \
-    "dipco/eval_worn" \
-    "librispeech/train_clean_100" \
-    "librispeech/train_clean_360" \
-    "librispeech/train_other_500" \
-    "tedlium2/train" \
-    "tedlium3/train" \
-    "voxforge/all_en" \
-    "ami/ihm_dev" \
-    "commonvoice/dev" \
-    "dipco/dev_beamformit_ref" \
-    "librispeech/dev_clean" \
-    "librispeech/dev_other" \
-    "tedlium2/dev" \
-    "tedlium3/dev" \
-    "ami/ihm_eval" \
-    "commonvoice/test" \
-    "dipco/eval_beamformit_ref" \
-    "librispeech/test_clean" \
-    "librispeech/test_other" \
-    "tedlium2/test" \
-    "tedlium3/test"; do
+#  for x in "ami/ihm_train" \
+#    "commonvoice/train" \
+#    "dipco/dev_worn" \
+#    "dipco/eval_worn" \
+#    "librispeech/train_clean_100" \
+#    "librispeech/train_clean_360" \
+#    "librispeech/train_other_500" \
+#    "tedlium2/train" \
+#    "tedlium3/train" \
+#    "voxforge/all_en" \
+#    "ami/ihm_dev" \
+#    "commonvoice/dev" \
+#    "dipco/dev_beamformit_ref" \
+#    "librispeech/dev_clean" \
+#    "librispeech/dev_other" \
+#    "tedlium2/dev" \
+#    "tedlium3/dev" \
+#    "ami/ihm_eval" \
+#    "commonvoice/test" \
+#    "dipco/eval_beamformit_ref" \
+#    "librispeech/test_clean" \
+#    "librispeech/test_other" \
+#    "tedlium2/test" \
+#    "tedlium3/test"; do
+#
+#    fbank_dir=${fbankdir}/$(echo ${x} | cut -d'/' -f1)
+#    mkdir -p "${fbank_dir}"
+#    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
+#    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbank_dir}
+#    utils/fix_data_dir.sh ${data_dir}/${x}
+#  done
 
-    fbank_dir=${fbankdir}/$(echo ${x} | cut -d'/' -f1)
-    mkdir -p "${fbank_dir}"
-    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
-    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbank_dir}
-    utils/fix_data_dir.sh ${data_dir}/${x}
-  done
-
-  utils/combine_data.sh --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
+  utils/combine_data.sh skip_fix true --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
     "${data_dir}/commonvoice/train" \
     "${data_dir}/dipco/dev_worn" \
     "${data_dir}/dipco/eval_worn" \
@@ -270,7 +270,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     "${data_dir}/tedlium3/train" \
     "${data_dir}/voxforge/all_en"
 
-  utils/combine_data.sh --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
+  utils/combine_data.sh skip_fix true --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
     "${data_dir}/commonvoice/dev" \
     "${data_dir}/dipco/dev_beamformit_ref" \
     "${data_dir}/librispeech/dev_clean" \
@@ -278,7 +278,7 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     "${data_dir}/tedlium2/dev" \
     "${data_dir}/tedlium3/dev"
 
-  utils/combine_data.sh --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
+  utils/combine_data.sh skip_fix true --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
     "${data_dir}/commonvoice/test" \
     "${data_dir}/dipco/eval_beamformit_ref" \
     "${data_dir}/librispeech/test_clean" \

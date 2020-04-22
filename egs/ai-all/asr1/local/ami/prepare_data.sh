@@ -17,4 +17,5 @@ local/ami/ami_"${base_mic}_scoring_data_prep.sh" "${dwl_dir}" "${mic}" eval "${d
 for dset in train dev eval; do
   # changed the original AMI data structure in the Kaldi recipe to the following
   utils/data/modify_speaker_info.sh --seconds-per-spk-max 30 "${data_dir}/${mic}/${dset}_orig" "${data_dir}/${mic}_${dset}"
+  utils/fix_data_dir.sh "${data_dir}/${mic}_${dset}"
 done

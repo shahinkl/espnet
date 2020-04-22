@@ -130,9 +130,6 @@ train_set="${data_dir}/combined/train"
 dev_set="${data_dir}/combined/dev"
 test_set="${data_dir}/combined/test"
 
-dict="${data_dir}"/lang_char/${train_set}_${bpemode}${nbpe}_units.txt
-bpemodel="${data_dir}"/lang_char/${train_set}_${bpemode}${nbpe}
-
 . utils/parse_options.sh || exit 1
 
 # Set bash to 'debug' mode, it will exit on :
@@ -227,63 +224,59 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   echo "stage 1: Feature Generation"
 
   # TRAIN
-#  for x in "ami/ihm_train" \
-#    "commonvoice/train" \
-#    "dipco/dev_worn" \
-#    "dipco/eval_worn" \
-#    "librispeech/train_clean_100" \
-#    "librispeech/train_clean_360" \
-#    "librispeech/train_other_500" \
-#    "tedlium2/train" \
-#    "tedlium3/train" \
-#    "voxforge/all_en" \
-#    "ami/ihm_dev" \
-#    "commonvoice/dev" \
-#    "dipco/dev_beamformit_ref" \
-#    "librispeech/dev_clean" \
-#    "librispeech/dev_other" \
-#    "tedlium2/dev" \
-#    "tedlium3/dev" \
-#    "ami/ihm_eval" \
-#    "commonvoice/test" \
-#    "dipco/eval_beamformit_ref" \
-#    "librispeech/test_clean" \
-#    "librispeech/test_other" \
-#    "tedlium2/test" \
-#    "tedlium3/test"; do
-#
-#    fbank_dir=${fbankdir}/$(echo ${x} | cut -d'/' -f1)
-#    mkdir -p "${fbank_dir}"
-#    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
-#    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbank_dir}
-#    utils/fix_data_dir.sh ${data_dir}/${x}
-#  done
+  #  for x in "ami/ihm_train" \
+  #    "commonvoice/train" \
+  #    "dipco/dev_worn" \
+  #    "dipco/eval_worn" \
+  #    "librispeech/train_clean_100" \
+  #    "librispeech/train_clean_360" \
+  #    "librispeech/train_other_500" \
+  #    "tedlium2/train" \
+  #    "tedlium3/train" \
+  #    "voxforge/all_en" \
+  #    "ami/ihm_dev" \
+  #    "commonvoice/dev" \
+  #    "dipco/dev_beamformit_ref" \
+  #    "librispeech/dev_clean" \
+  #    "librispeech/dev_other" \
+  #    "tedlium2/dev" \
+  #    "tedlium3/dev" \
+  #    "ami/ihm_eval" \
+  #    "commonvoice/test" \
+  #    "dipco/eval_beamformit_ref" \
+  #    "librispeech/test_clean" \
+  #    "librispeech/test_other" \
+  #    "tedlium2/test" \
+  #    "tedlium3/test"; do
+  #
+  #    fbank_dir=${fbankdir}/$(echo ${x} | cut -d'/' -f1)
+  #    mkdir -p "${fbank_dir}"
+  #    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
+  #    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbank_dir}
+  #    utils/fix_data_dir.sh ${data_dir}/${x}
+  #  done
 
-  utils/combine_data.sh --skip_fix true --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
+  utils/combine_data.sh --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
     "${data_dir}/commonvoice/train" \
     "${data_dir}/dipco/dev_worn" \
     "${data_dir}/dipco/eval_worn" \
     "${data_dir}/librispeech/train_clean_100" \
     "${data_dir}/librispeech/train_clean_360" \
     "${data_dir}/librispeech/train_other_500" \
-    "${data_dir}/tedlium2/train" \
-    "${data_dir}/tedlium3/train" \
-    "${data_dir}/voxforge/all_en"
+    "${data_dir}/tedlium3/train"
 
-  utils/combine_data.sh --skip_fix true --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
+  utils/combine_data.sh --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
     "${data_dir}/commonvoice/dev" \
     "${data_dir}/dipco/dev_beamformit_ref" \
     "${data_dir}/librispeech/dev_clean" \
     "${data_dir}/librispeech/dev_other" \
-    "${data_dir}/tedlium2/dev" \
     "${data_dir}/tedlium3/dev"
 
-  utils/combine_data.sh --skip_fix true --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
+  utils/combine_data.sh --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
     "${data_dir}/commonvoice/test" \
     "${data_dir}/dipco/eval_beamformit_ref" \
     "${data_dir}/librispeech/test_clean" \
     "${data_dir}/librispeech/test_other" \
-    "${data_dir}/tedlium2/test" \
     "${data_dir}/tedlium3/test"
 
   # remove utt having more than 3000 frames
@@ -319,14 +312,16 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 #  done
 fi
 
+dict="${data_dir}"/lang_char/train_${bpemode}${nbpe}_units.txt
+bpemodel="${data_dir}"/lang_char/train_${bpemode}${nbpe}
 if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
   ### Task dependent. You have to check non-linguistic symbols used in the corpus.
   echo "stage 2: Dictionary and Json Data Preparation"
   mkdir -p "${data_dir}"/lang_char/
   echo "<unk> 1" >${dict} # <unk> must be 1, 0 will be used for "blank" in CTC
-  cut -f 2- -d" " ${train_set}/text >data/lang_char/input.txt
+  cut -f 2- -d" " ${train_set}/text >${data_dir}/lang_char/input.txt
   spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
-  spm_encode --model=${bpemodel}.model --output_format=piece <data/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >>${dict}
+  spm_encode --model=${bpemodel}.model --output_format=piece <${data_dir}/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >>${dict}
   wc -l ${dict}
 
   # make json labels

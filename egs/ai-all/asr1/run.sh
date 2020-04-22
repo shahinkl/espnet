@@ -10,7 +10,7 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=1
+stage=0
 stop_stage=100
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
@@ -160,17 +160,17 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
     sleep 90
   done
-  # 5. TEDLIUM 2
-  printf "\n\nStarting to download tedlium-2 dataset ...\n"
-  local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
-  sleep 15
+#  # 5. TEDLIUM 2
+#  printf "\n\nStarting to download tedlium-2 dataset ...\n"
+#  local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
+#  sleep 15
   # 6. TEDLIUM 3
   printf "\n\nStarting to download tedlium-3 dataset ...\n"
   local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} TEDLIUM_release-3.tgz &
   sleep 15
-  # 7. VOXFORGE
-  printf "\n\nStarting to download voxforge dataset ...\n"
-  local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
+#  # 7. VOXFORGE
+#  printf "\n\nStarting to download voxforge dataset ...\n"
+#  local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
   wait # Wait for all process to complete
   printf "\n\n Completed stage -1: Data Download\n"
 fi
@@ -198,17 +198,17 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
   done
 
-  # 5. TEDLIUM-2
-  printf "\n\nStarting to prepare tedlium2 data ...\n"
-  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
+#  # 5. TEDLIUM-2
+#  printf "\n\nStarting to prepare tedlium2 data ...\n"
+#  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
 
   # 6. TEDLIUM-3
   printf "\n\nStarting to prepare tedlium3 data ...\n"
   local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
 
-  # 7. VOXFORGE
-  printf "\n\nStarting to prepare voxforge data ...\n"
-  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
+#  # 7. VOXFORGE
+#  printf "\n\nStarting to prepare voxforge data ...\n"
+#  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
   printf "\n\n Completed stage 0: Data preparation\n"
 fi
@@ -222,39 +222,33 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   ### Task dependent. You have to design training and dev sets by yourself.
   ### But you can utilize Kaldi recipes in most cases
   echo "stage 1: Feature Generation"
+  for x in "ami/ihm_train" \
+    "commonvoice/train" \
+    "dipco/dev_worn" \
+    "dipco/eval_worn" \
+    "librispeech/train_clean_100" \
+    "librispeech/train_clean_360" \
+    "librispeech/train_other_500" \
+    "tedlium3/train" \
+    "ami/ihm_dev" \
+    "commonvoice/dev" \
+    "dipco/dev_beamformit_ref" \
+    "librispeech/dev_clean" \
+    "librispeech/dev_other" \
+    "tedlium3/dev" \
+    "ami/ihm_eval" \
+    "commonvoice/test" \
+    "dipco/eval_beamformit_ref" \
+    "librispeech/test_clean" \
+    "librispeech/test_other" \
+    "tedlium3/test"; do
 
-  # TRAIN
-  #  for x in "ami/ihm_train" \
-  #    "commonvoice/train" \
-  #    "dipco/dev_worn" \
-  #    "dipco/eval_worn" \
-  #    "librispeech/train_clean_100" \
-  #    "librispeech/train_clean_360" \
-  #    "librispeech/train_other_500" \
-  #    "tedlium2/train" \
-  #    "tedlium3/train" \
-  #    "voxforge/all_en" \
-  #    "ami/ihm_dev" \
-  #    "commonvoice/dev" \
-  #    "dipco/dev_beamformit_ref" \
-  #    "librispeech/dev_clean" \
-  #    "librispeech/dev_other" \
-  #    "tedlium2/dev" \
-  #    "tedlium3/dev" \
-  #    "ami/ihm_eval" \
-  #    "commonvoice/test" \
-  #    "dipco/eval_beamformit_ref" \
-  #    "librispeech/test_clean" \
-  #    "librispeech/test_other" \
-  #    "tedlium2/test" \
-  #    "tedlium3/test"; do
-  #
-  #    fbank_dir=${fbankdir}/$(echo ${x} | cut -d'/' -f1)
-  #    mkdir -p "${fbank_dir}"
-  #    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
-  #    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbank_dir}
-  #    utils/fix_data_dir.sh ${data_dir}/${x}
-  #  done
+    fbank_dir=${fbankdir}/$(echo ${x} | cut -d'/' -f1)
+    mkdir -p "${fbank_dir}"
+    printf "\n\nGenerating features for: %s\n" ${data_dir}/${x}
+    steps/make_fbank.sh --cmd "$train_cmd" --nj ${nj} --write_utt2num_frames true ${data_dir}/${x} exp/make_fbank/${x} ${fbank_dir}
+    utils/fix_data_dir.sh ${data_dir}/${x}
+  done
 
   utils/combine_data.sh --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
     "${data_dir}/commonvoice/train" \

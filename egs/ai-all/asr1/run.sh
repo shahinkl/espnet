@@ -229,8 +229,8 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   # TRAIN
   for x in "ami/ihm_train" \
     "commonvoice/train_data" \
-    "dipco/dev_worn_stereo" \
-    "dipco/eval_worn_stereo" \
+    "dipco/dev_worn" \
+    "dipco/eval_worn" \
     "librispeech/train_clean_100" \
     "librispeech/train_clean_360" \
     "librispeech/train_other_500" \
@@ -239,7 +239,6 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     "voxforge/all_en" \
     "ami/ihm_dev" \
     "commonvoice/dev_data" \
-    "dipco/dev_worn" \
     "dipco/dev_beamformit_ref" \
     "librispeech/dev_clean" \
     "librispeech/dev_other" \
@@ -247,7 +246,6 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
     "tedlium3/dev" \
     "ami/ihm_eval" \
     "commonvoice/test_data" \
-    "dipco/eval_worn" \
     "dipco/eval_beamformit_ref" \
     "librispeech/test_clean" \
     "librispeech/test_other" \
@@ -365,9 +363,10 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   fi
   if [ ! -e ${lmdwl_dir} ]; then
     mkdir -p ${lmdwl_dir}
-    cut -f 2- -d" " ${train_set}/text | gzip -c >${lmdwl_dir}/${train_set}_text.gz
+    cut -f 2- -d" " ${train_set}/text | gzip -c >${lmdwl_dir}/train_text.gz
+    cut -f 2- -d" " ${test_set}/text | gzip -c >${lmdwl_dir}/test_text.gz
     # combine external text and transcriptions and shuffle them with seed 777
-    zcat ${lmdwl_dir}/librispeech-lm-norm.txt.gz ${lmdwl_dir}/${train_set}_text.gz |
+    zcat ${lmdwl_dir}/librispeech-lm-norm.txt.gz ${lmdwl_dir}/train_text.gz ${lmdwl_dir}/test_text.gz |
       spm_encode --model=${bpemodel}.model --output_format=piece >${data_dir}/lm/train.txt
     cut -f 2- -d" " ${dev_set}/text | spm_encode --model=${bpemodel}.model --output_format=piece >${data_dir}/lm/valid.txt
   fi

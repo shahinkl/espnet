@@ -10,7 +10,7 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=2
+stage=3
 stop_stage=100
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
@@ -346,14 +346,9 @@ mkdir -p ${lmexpdir}
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   echo "stage 3: LM Preparation"
   lmdwl_dir=${data_dir}/lm/downloads
-  mkdir -p ${lmdwl_dir}
-  #  lmdwl_dir=data/local/lm_train_${bpemode}${nbpe}
-  # use external data
-  if [ ! -e ${lmdwl_dir}/librispeech-lm-norm.txt.gz ]; then
-    wget http://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz -P ${lmdwl_dir}
-  fi
   if [ ! -e ${lmdwl_dir} ]; then
     mkdir -p ${lmdwl_dir}
+    wget http://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz -P ${lmdwl_dir}
     cut -f 2- -d" " ${train_set}/text | gzip -c >${lmdwl_dir}/train_text.gz
     cut -f 2- -d" " ${test_set}/text | gzip -c >${lmdwl_dir}/test_text.gz
     # combine external text and transcriptions and shuffle them with seed 777

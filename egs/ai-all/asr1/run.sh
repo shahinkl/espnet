@@ -160,17 +160,17 @@ if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     local/librispeech/download_and_untar.sh "${dwl_dir}/librispeech" ${data_url_ls} ${part} &
     sleep 90
   done
-#  # 5. TEDLIUM 2
-#  printf "\n\nStarting to download tedlium-2 dataset ...\n"
-#  local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
-#  sleep 15
+  #  # 5. TEDLIUM 2
+  #  printf "\n\nStarting to download tedlium-2 dataset ...\n"
+  #  local/tedlium2/download_and_untar.sh "${dwl_dir}/tedlium2" ${data_url_td2} TEDLIUM_release2.tar.gz &
+  #  sleep 15
   # 6. TEDLIUM 3
   printf "\n\nStarting to download tedlium-3 dataset ...\n"
   local/tedlium3/download_and_untar.sh "${dwl_dir}/tedlium3" ${data_url_td3} TEDLIUM_release-3.tgz &
   sleep 15
-#  # 7. VOXFORGE
-#  printf "\n\nStarting to download voxforge dataset ...\n"
-#  local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
+  #  # 7. VOXFORGE
+  #  printf "\n\nStarting to download voxforge dataset ...\n"
+  #  local/voxforge/getdata.sh ${lang} "${dwl_dir}/voxforge" &
   wait # Wait for all process to complete
   printf "\n\n Completed stage -1: Data Download\n"
 fi
@@ -198,17 +198,17 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     local/librispeech/data_prep.sh "${dwl_dir}/librispeech/LibriSpeech/${part}" "${data_dir}/librispeech/${part//-/_}"
   done
 
-#  # 5. TEDLIUM-2
-#  printf "\n\nStarting to prepare tedlium2 data ...\n"
-#  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
+  #  # 5. TEDLIUM-2
+  #  printf "\n\nStarting to prepare tedlium2 data ...\n"
+  #  local/tedlium2/prepare_data.sh "${dwl_dir}/tedlium2" "${data_dir}/tedlium2"
 
   # 6. TEDLIUM-3
   printf "\n\nStarting to prepare tedlium3 data ...\n"
   local/tedlium3/prepare_data.sh "${dwl_dir}/tedlium3" "${data_dir}/tedlium3" "${data_type}"
 
-#  # 7. VOXFORGE
-#  printf "\n\nStarting to prepare voxforge data ...\n"
-#  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
+  #  # 7. VOXFORGE
+  #  printf "\n\nStarting to prepare voxforge data ...\n"
+  #  local/voxforge/prepare_data.sh "${dwl_dir}/voxforge" "${data_dir}/voxforge" "${lang}"
 
   printf "\n\n Completed stage 0: Data preparation\n"
 fi
@@ -346,16 +346,23 @@ mkdir -p ${lmexpdir}
 if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
   echo "stage 3: LM Preparation"
   lmdwl_dir=${data_dir}/lm/downloads
-  if [ ! -e ${lmdwl_dir} ]; then
-    mkdir -p ${lmdwl_dir}
+  mkdir -p ${lmdwl_dir}
+  if [ ! -e ${lmdwl_dir}/librispeech-lm-norm.txt.gz ]; then
     wget http://www.openslr.org/resources/11/librispeech-lm-norm.txt.gz -P ${lmdwl_dir}
+  fi
+
+  if [ ! -e ${lmdwl_dir}/train_text.gz ]; then
     cut -f 2- -d" " ${train_set}/text | gzip -c >${lmdwl_dir}/train_text.gz
     cut -f 2- -d" " ${test_set}/text | gzip -c >${lmdwl_dir}/test_text.gz
+  fi
+
+  if [ ! -e ${data_dir}/lm/train.txt ]; then
     # combine external text and transcriptions and shuffle them with seed 777
     zcat ${lmdwl_dir}/librispeech-lm-norm.txt.gz ${lmdwl_dir}/train_text.gz ${lmdwl_dir}/test_text.gz |
       spm_encode --model=${bpemodel}.model --output_format=piece >${data_dir}/lm/train.txt
     cut -f 2- -d" " ${dev_set}/text | spm_encode --model=${bpemodel}.model --output_format=piece >${data_dir}/lm/valid.txt
   fi
+
   ${cuda_cmd} --gpu ${ngpu} ${lmexpdir}/train.log \
     lm_train.py \
     --config ${lm_config} \

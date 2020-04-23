@@ -25,7 +25,7 @@ dumpdir=dump
 N=0
 
 # verbose option
-verbose=2
+verbose=0
 
 # Resume the training from snapshot
 resume=

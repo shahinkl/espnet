@@ -17,7 +17,7 @@ etype: lstmp
 elayers: 8
 eunits: 1024
 eprojs: 1024
-subsample: "1_2_2_1_1_1_1_1"
+subsample: "1_1_1_1_1"
 dropout-rate: 0.2
 ## decoder related
 dtype: lstm
@@ -28,8 +28,8 @@ dropout-rate-decoder: 0.2
 dropout-rate-embed-decoder: 0.2
 ## attention related
 atype: location
-adim: 256
-aheads: 4
+adim: 512
+aheads: 1
 awin: 5
 aconv-chans: 10
 aconv-filts: 100

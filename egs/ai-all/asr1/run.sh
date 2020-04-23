@@ -224,21 +224,21 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
   echo "stage 1: Feature Generation"
   for x in "ami/ihm_train" \
     "commonvoice/train" \
-    "dipco/dev_worn" \
-    "dipco/eval_worn" \
+    "dipco/dev_beamformit_ref" \
+    "dipco/eval_beamformit_ref" \
     "librispeech/train_clean_100" \
     "librispeech/train_clean_360" \
     "librispeech/train_other_500" \
     "tedlium3/train" \
     "ami/ihm_dev" \
     "commonvoice/dev" \
-    "dipco/dev_beamformit_ref" \
+    "dipco/dev_worn" \
     "librispeech/dev_clean" \
     "librispeech/dev_other" \
     "tedlium3/dev" \
     "ami/ihm_eval" \
     "commonvoice/test" \
-    "dipco/eval_beamformit_ref" \
+    "dipco/eval_worn" \
     "librispeech/test_clean" \
     "librispeech/test_other" \
     "tedlium3/test"; do
@@ -252,8 +252,8 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
   utils/combine_data.sh --extra_files utt2num_frames ${train_set_org} "${data_dir}/ami/ihm_train" \
     "${data_dir}/commonvoice/train" \
-    "${data_dir}/dipco/dev_worn" \
-    "${data_dir}/dipco/eval_worn" \
+    "${data_dir}/dipco/dev_beamformit_ref" \
+    "${data_dir}/dipco/eval_beamformit_ref" \
     "${data_dir}/librispeech/train_clean_100" \
     "${data_dir}/librispeech/train_clean_360" \
     "${data_dir}/librispeech/train_other_500" \
@@ -261,14 +261,14 @@ if [ ${stage} -le 1 ] && [ ${stop_stage} -ge 1 ]; then
 
   utils/combine_data.sh --extra_files utt2num_frames ${dev_set_org} "${data_dir}/ami/ihm_dev" \
     "${data_dir}/commonvoice/dev" \
-    "${data_dir}/dipco/dev_beamformit_ref" \
+    "${data_dir}/dipco/dev_worn" \
     "${data_dir}/librispeech/dev_clean" \
     "${data_dir}/librispeech/dev_other" \
     "${data_dir}/tedlium3/dev"
 
   utils/combine_data.sh --extra_files utt2num_frames ${test_set} "${data_dir}/ami/ihm_eval" \
     "${data_dir}/commonvoice/test" \
-    "${data_dir}/dipco/eval_beamformit_ref" \
+    "${data_dir}/dipco/eval_worn" \
     "${data_dir}/librispeech/test_clean" \
     "${data_dir}/librispeech/test_other" \
     "${data_dir}/tedlium3/test"

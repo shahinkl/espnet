@@ -10,8 +10,8 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=3
-stop_stage=100
+stage=0
+stop_stage=2
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
 ngpu=8

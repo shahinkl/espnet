@@ -22,10 +22,10 @@ debugmode=1
 dumpdir=dump
 
 # number of minibatches to be used (mainly for debugging). "0" uses all minibatches.
-N=1
+N=0
 
 # verbose option
-verbose=0
+verbose=2
 
 # Resume the training from snapshot
 resume=
@@ -383,9 +383,9 @@ if [ -z ${tag} ]; then
   if ${do_delta}; then
     expname=${expname}_delta
   fi
-  if [ -n "${preprocess_config}" ]; then
-    expname=${expname}_$(basename ${preprocess_config%.*})
-  fi
+#  if [ -n "${preprocess_config}" ]; then
+#    expname=${expname}_$(basename ${preprocess_config%.*})
+#  fi
 else
   expname=train_${backend}_${tag}
 fi
@@ -395,10 +395,26 @@ mkdir -p ${expdir}
 if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
   echo "stage 4: Network Training"
   printf "\n\nTraining export directory: %s\n" "${expdir}"
+  #  ${cuda_cmd} --gpu ${ngpu} ${expdir}/train.log \
+  #    asr_train.py \
+  #    --config ${train_config} \
+  #    --preprocess-conf ${preprocess_config} \
+  #    --ngpu ${ngpu} \
+  #    --backend ${backend} \
+  #    --outdir ${expdir}/results \
+  #    --tensorboard-dir tensorboard/${expname} \
+  #    --debugmode ${debugmode} \
+  #    --dict ${dict} \
+  #    --debugdir ${expdir} \
+  #    --minibatches ${N} \
+  #    --verbose ${verbose} \
+  #    --resume ${resume} \
+  #    --train-json ${train_set}/data_${bpemode}${nbpe}.json \
+  #    --valid-json ${dev_set}/data_${bpemode}${nbpe}.json
+
   ${cuda_cmd} --gpu ${ngpu} ${expdir}/train.log \
     asr_train.py \
     --config ${train_config} \
-    --preprocess-conf ${preprocess_config} \
     --ngpu ${ngpu} \
     --backend ${backend} \
     --outdir ${expdir}/results \

@@ -1,6 +1,6 @@
 # minibatch related
-batch-size: 24
-maxlen-in: 300
+batch-size: 16
+maxlen-in: 400
 maxlen-out: 150
 
 # optimization related
@@ -8,7 +8,7 @@ criterion: loss
 early-stop-criterion: "validation/main/loss"
 sortagrad: 0
 opt: noam
-epochs: 30
+epochs: 100
 patience: 0
 accum-grad: 4
 grad-clip: 5.0

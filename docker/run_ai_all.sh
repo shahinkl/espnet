@@ -3,7 +3,7 @@
 docker_gpu="all"
 docker_egs=ai-all/asr1
 docker_folders=
-docker_cuda=10.0
+docker_cuda=10.1
 docker_user=true
 docker_env=
 docker_cmd=

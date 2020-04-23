@@ -13,7 +13,7 @@ patience: 0
 
 # network architecture
 ## encoder related
-etype: lstmp
+etype: vgglstmp
 elayers: 8
 eunits: 1024
 eprojs: 1024
@@ -29,7 +29,7 @@ dropout-rate-embed-decoder: 0.2
 ## attention related
 atype: location
 adim: 512
-aheads: 1
+aheads: 4
 awin: 5
 aconv-chans: 10
 aconv-filts: 100

@@ -1,35 +1,35 @@
 # minibatch related
-batch-size: 16
-maxlen-in: 384
+batch-size: 24
+maxlen-in: 400
 maxlen-out: 150
 
 # optimization related
 criterion: loss
 early-stop-criterion: "validation/main/loss"
-sortagrad: 0
+sortagrad: 1
 opt: adadelta
-epochs: 100
+epochs: 120
 patience: 0
 
 # network architecture
 ## encoder related
-etype: lstm
+etype: lstmp
 elayers: 8
-eunits: 512
-eprojs: 512
-subsample: "1_1_1_1_1"
-dropout-rate: 0.3
+eunits: 1024
+eprojs: 1024
+subsample: "1_2_2_1_1_1_1_1"
+dropout-rate: 0.2
 ## decoder related
 dtype: lstm
-dlayers: 1
+dlayers: 2
 dec-embed-dim: 512
 dunits: 512
 dropout-rate-decoder: 0.2
 dropout-rate-embed-decoder: 0.2
 ## attention related
 atype: location
-adim: 512
-aheads: 1
+adim: 256
+aheads: 4
 awin: 5
 aconv-chans: 10
 aconv-filts: 100

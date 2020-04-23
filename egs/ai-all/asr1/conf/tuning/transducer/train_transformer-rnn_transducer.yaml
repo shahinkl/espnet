@@ -23,20 +23,20 @@ transformer-attn-dropout-rate-encoder: 0.4
 etype: transformer
 transformer-input-layer: conv2d
 elayers: 8
-eunits: 960
+eunits: 768
 dropout-rate: 0.2
 ## decoder related
 dtype: lstm
 dlayers: 1
-dec-embed-dim: 960
-dunits: 960
+dec-embed-dim: 768
+dunits: 768
 dropout-rate-decoder: 0.2
 dropout-rate-embed-decoder: 0.1
 ## attention related
-adim: 960
+adim: 768
 aheads: 4
 ## joint network related
-joint-dim: 960
+joint-dim: 768
 
 # transducer related
 mtlalpha: 1.0 # mtlalpha should be set to 1.0 (CTC) to use transducer

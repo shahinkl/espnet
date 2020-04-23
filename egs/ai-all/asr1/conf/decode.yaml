@@ -1,4 +1,1 @@
-# decoding parameters
-batch: 0
-beam-size: 20
-score-norm-transducer: True
+tuning/transducer/decode_transducer.yaml

@@ -14,7 +14,7 @@ patience: 0
 # network architecture
 ## encoder related
 etype: lstm
-elayers: 10
+elayers: 8
 eunits: 1024
 eprojs: 1024
 subsample: "1_1_1_1_1"

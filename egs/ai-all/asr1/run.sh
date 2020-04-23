@@ -394,6 +394,7 @@ mkdir -p ${expdir}
 
 if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
   echo "stage 4: Network Training"
+  printf "\n\nTraining export directory: %s\n" "${expdir}"
   ${cuda_cmd} --gpu ${ngpu} ${expdir}/train.log \
     asr_train.py \
     --config ${train_config} \

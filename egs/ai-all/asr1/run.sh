@@ -22,7 +22,7 @@ debugmode=1
 dumpdir=dump
 
 # number of minibatches to be used (mainly for debugging). "0" uses all minibatches.
-N=8
+N=1
 
 # verbose option
 verbose=0

@@ -379,7 +379,7 @@ if [ ${stage} -le 3 ] && [ ${stop_stage} -ge 3 ]; then
 fi
 
 if [ -z ${tag} ]; then
-  expname=${train_set}_${backend}_$(basename ${train_config%.*})
+  expname=train_${backend}_$(basename ${train_config%.*})
   if ${do_delta}; then
     expname=${expname}_delta
   fi
@@ -387,7 +387,7 @@ if [ -z ${tag} ]; then
     expname=${expname}_$(basename ${preprocess_config%.*})
   fi
 else
-  expname=${train_set}_${backend}_${tag}
+  expname=train_${backend}_${tag}
 fi
 expdir=exp/${expname}
 mkdir -p ${expdir}

@@ -13,7 +13,7 @@ pos-enc: none
 unit: 2048
 
 # minibatch related
-batchsize: 72
+batchsize: 64
 maxlen: 40
 
 # optimization related

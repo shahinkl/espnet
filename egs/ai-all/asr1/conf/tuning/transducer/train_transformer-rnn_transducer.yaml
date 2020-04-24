@@ -1,6 +1,6 @@
 # minibatch related
 batch-size: 4
-maxlen-in: 384
+maxlen-in: 960
 maxlen-out: 150
 
 # optimization related

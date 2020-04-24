@@ -29,7 +29,7 @@ dropout-rate-embed-decoder: 0.1
 ## attention related
 atype: location
 adim: 512
-aheads: 1
+aheads: 4
 awin: 5
 aconv-chans: 10
 aconv-filts: 100

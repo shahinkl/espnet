@@ -1,6 +1,6 @@
 # minibatch related
-batch-size: 4
-maxlen-in: 960
+batch-size: 32
+maxlen-in: 800
 maxlen-out: 150
 
 # optimization related
@@ -23,20 +23,20 @@ transformer-attn-dropout-rate-encoder: 0.4
 etype: transformer
 transformer-input-layer: conv2d
 elayers: 8
-eunits: 960
+eunits: 512
 dropout-rate: 0.2
 ## decoder related
 dtype: lstm
 dlayers: 1
 dec-embed-dim: 960
-dunits: 960
+dunits: 512
 dropout-rate-decoder: 0.2
 dropout-rate-embed-decoder: 0.1
 ## attention related
-adim: 960
+adim: 512
 aheads: 4
 ## joint network related
-joint-dim: 960
+joint-dim: 512
 
 # transducer related
 mtlalpha: 1.0 # mtlalpha should be set to 1.0 (CTC) to use transducer

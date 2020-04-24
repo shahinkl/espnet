@@ -14,7 +14,7 @@ patience: 0
 # network architecture
 ## encoder related
 etype: vggblstm
-elayers: 8
+elayers: 6
 eunits: 512
 eprojs: 512
 subsample: "1"

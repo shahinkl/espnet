@@ -28,7 +28,7 @@ N=0
 verbose=0
 
 # Resume the training from snapshot
-resume="snapshot.ep.1"
+resume="exp/train_pytorch_train/results/snapshot.ep.1"
 
 # feature configuration
 do_delta=false

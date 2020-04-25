@@ -1,7 +1,7 @@
 # minibatch related
 batch-size: 16
-maxlen-in: 672
-maxlen-out: 256
+maxlen-in: 800
+maxlen-out: 400
 
 # optimization related
 criterion: loss
@@ -25,7 +25,7 @@ etype: transformer
 transformer-input-layer: vgg2l
 elayers: 10
 eunits: 672
-dropout-rate: 0.4
+dropout-rate: 0.1
 ## decoder related
 dtype: transformer
 dlayers: 2

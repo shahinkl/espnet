@@ -22,8 +22,8 @@ transformer-attn-dropout-rate-decoder: 0.1
 # network architecture
 ## encoder related
 etype: transformer
-transformer-input-layer: vgg2l
-elayers: 10
+transformer-input-layer: conv2d
+elayers: 8
 eunits: 672
 dropout-rate: 0.1
 ## decoder related

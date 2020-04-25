@@ -28,7 +28,7 @@ N=0
 verbose=0
 
 # Resume the training from snapshot
-resume=
+resume="snapshot.ep.1"
 
 # feature configuration
 do_delta=false

@@ -313,10 +313,11 @@ if [ ${stage} -le 2 ] && [ ${stop_stage} -ge 2 ]; then
   ### Task dependent. You have to check non-linguistic symbols used in the corpus.
   echo "stage 2: Dictionary and Json Data Preparation"
   mkdir -p "${data_dir}"/lang_char/
+
   echo "<unk> 1" >${dict} # <unk> must be 1, 0 will be used for "blank" in CTC
   cut -f 2- -d" " ${train_set}/text >${data_dir}/lang_char/input.txt
-  spm_train --input=data/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
-  spm_encode --model=${bpemodel}.model --output_format=piece <${data_dir}/lang_char/input.txt | tr ' ' '\n' | sort | uniq | awk '{print $0 " " NR+1}' >>${dict}
+  spm_train --input=${data_dir}/lang_char/input.txt --vocab_size=${nbpe} --model_type=${bpemode} --model_prefix=${bpemodel} --input_sentence_size=100000000
+  spm_encode --model=${bpemodel}.model --output_format=piece <${data_dir}/lang_char/input.txt | tr ' ' '\n' | tr -d '[:punct:]' | tr -d '”' | tr -d '→' | tr -d '—' | tr -d 'به' | tr -d 'چی' | tr -d 'حرف' | tr -d 'راجع' | tr -d 'میزنی؟' | tr -d 'α' | tr -d 'π' | tr -d 'πgroup' | tr -d 'великий' | tr -d 'князь' | sort | uniq | awk '{print tolower($0) " " NR+1}' >>${dict}
   wc -l ${dict}
 
   # make json labels

@@ -48,7 +48,7 @@ while(<CSV>) {
   $uttId =~ tr/\//-/;
   # speaker information should be suffix of the utterance Id
   $uttId = "$spkr-$uttId";
-  $text =~ tr/a-z/A-Z/;
+  $text =~ tr/A-Z/a-z/; # Convert to lower case
   if (index($text, "{") != -1 and index($text, "}" != -1)) {
     next;
   }

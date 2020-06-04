@@ -39,6 +39,8 @@ if [ "${cmd_backend}" = local ]; then
     export cuda_cmd="run.pl"
     # Used for "*_recog.py"
     export decode_cmd="run.pl"
+    # Used for "*_trace.py"
+    export trace_cmd="run.pl"
 
 # "qsub" (SGE, Torque, PBS, etc.)
 elif [ "${cmd_backend}" = sge ]; then

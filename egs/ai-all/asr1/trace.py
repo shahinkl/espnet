@@ -5,11 +5,11 @@ import torchaudio
 
 from espnet.asr.pytorch_backend.trace import TraceModel
 
-model_path = 'exp/train_960_pytorch_train_specaug/results/model.val5.avg.best'
-lm_path = 'exp/lang/rnnlm/model.best'
+model_path = 'exp/acoustic/model.loss.best'
+lm_path = 'exp/language/rnnlm.model.best'
 tm = TraceModel(model_path=model_path,
                 lm_path=lm_path)
-waveform, sample_rate = torchaudio.load_wav('resource/arabic.wav')
+waveform, sample_rate = torchaudio.load_wav('wav/arabic.wav')
 module = torch.jit.trace(tm, waveform, check_trace=False)
 module.save(os.path.join(os.path.dirname(model_path), '{}_traced.pt'.format(os.path.basename(model_path))))
 

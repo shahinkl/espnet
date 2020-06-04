@@ -10,8 +10,8 @@
 backend=pytorch
 
 # start from -1 if you need to start from data download
-stage=4
-stop_stage=4
+stage=6
+stop_stage=6
 
 # number of gpus ("0" uses cpu, otherwise use gpu)
 ngpu=8
@@ -503,4 +503,12 @@ if [ ${stage} -le 5 ] && [ ${stop_stage} -ge 5 ]; then
   for pid in "${pids[@]}"; do wait ${pid} || ((++i)); done
   [ ${i} -gt 0 ] && echo "$0: ${i} background jobs are failed." && false
   echo "Finished"
+fi
+
+if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
+  echo "stage 6: Tracing"
+  ${trace_cmd} ${expdir}/train.log \
+    asr_trace.py \
+    --model_path "${expdir}/train_pytorch_train/results/model.loss.best" \
+    --lm_path "${expdir}/train_rnnlm_pytorch_lm_unigram5000_ngpu8/rnnlm.loss.best"
 fi

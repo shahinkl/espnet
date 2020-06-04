@@ -5,7 +5,7 @@ LABEL maintainer "Nelson Yalta <nyalta21@gmail.com>"
 ARG CUDA_VER
 WORKDIR /
 RUN mkdir -p /espnet
-COPY . /
+COPY espnet /espnet
 RUN ls -lrt /espnet
 #ARG ESPNET_LOCATION=https://github.com/espnet/espnet
 #
@@ -31,9 +31,9 @@ RUN if [ -z "$( nvcc -V )" ]; then \
         sed -i 's|which nvidia-smi|which nvcc|g' Makefile;  \
 #        sed -i 's|_install.py --torch|_install.py --no-cupy --torch|g' Makefile && \
 #        sed -i 's|which nvidia-smi|which nvcc|g' Makefile;  \
-    fi; \ 
+    fi; \
     if [ "${CUDA_VER}" = "10.1" ]; then \
-        # Pytorch 1.3.1 is not supported by warpctc 
+        # Pytorch 1.3.1 is not supported by warpctc
         MY_OPTS="${MY_OPTS} TH_VERSION=1.5.0";  \
     fi; \
     echo "Make with options ${MY_OPTS}"; \

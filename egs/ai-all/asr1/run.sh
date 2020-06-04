@@ -509,6 +509,6 @@ if [ ${stage} -le 6 ] && [ ${stop_stage} -ge 6 ]; then
   echo "stage 6: Tracing"
   ${trace_cmd} ${expdir}/train.log \
     asr_trace.py \
-    --model_path "${expdir}/train_pytorch_train/results/model.loss.best" \
+    --model_path "${expdir}/results/model.loss.best" \
     --lm_path "${expdir}/train_rnnlm_pytorch_lm_unigram5000_ngpu8/rnnlm.loss.best"
 fi

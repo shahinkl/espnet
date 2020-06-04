@@ -4,8 +4,9 @@ LABEL maintainer "Nelson Yalta <nyalta21@gmail.com>"
 
 ARG CUDA_VER
 WORKDIR /
-
-COPY ../../../../../espnet .
+RUN mkdir -p /espnet
+COPY ../../../.. /espnet
+RUN ls -lrt /espnet
 #ARG ESPNET_LOCATION=https://github.com/espnet/espnet
 #
 ## Download ESPnet

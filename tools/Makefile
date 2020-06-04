@@ -7,7 +7,8 @@ PYTHON_VERSION := 3.7.3
 CUPY_VERSION := 6.0.0
 CUDA_VERSION := 10.1
 # PyTorch version: 0.4.1, 1.0.0, 1.0.1, 1.1.0, 1.2.0, 1.3.0, 1.3.1, 1.4.0
-TH_VERSION := 1.4.0
+TH_VERSION := 1.5.0
+TH_AUDIO_VERSION := 0.5.0
 ifeq ($(shell expr $(strip $(subst .,,$(TH_VERSION))) \< 120), 1)
 INSTALL_WARPCTC := 1
 else
@@ -24,10 +25,10 @@ GCC_VERSION := $(shell gcc -dumpversion)
 
 
 ifneq ($(shell which nvidia-smi),) # 'nvcc' found
-CONDA_PYTORCH := pytorch=$(TH_VERSION) cudatoolkit=$(CUDA_VERSION)
+CONDA_PYTORCH := pytorch=$(TH_VERSION) cudatoolkit=$(CUDA_VERSION) torchaudio=$TH_AUDIO_VERSION
 CUDA_DEPS := cupy.done
 else
-CONDA_PYTORCH := pytorch-cpu=$(TH_VERSION)
+CONDA_PYTORCH := pytorch-cpu=$(TH_VERSION) torchaudio=$TH_AUDIO_VERSION
 CUDA_DEPS :=
 endif
 
@@ -61,6 +62,7 @@ espnet.done: venv
 	. venv/bin/activate; pip install pip --upgrade
 	. venv/bin/activate; pip install -e ..
 	. venv/bin/activate; pip install torch==$(TH_VERSION)
+	. venv/bin/activate; pip install torchaudio==$(TH_AUDIO_VERSION)
 	touch espnet.done
 else
 miniconda.sh:

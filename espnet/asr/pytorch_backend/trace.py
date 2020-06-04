@@ -42,6 +42,7 @@ class TraceModel(torch.nn.Module):
         recog_args.minlenratio = 0.0
         recog_args.lm_weight = 0.0
         recog_args.nbest = 10
+        recog_args.score_norm_transducer = True
         return recog_args
 
     def __make_lm_module(self, lm_path: str):
